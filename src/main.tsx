@@ -4,7 +4,7 @@ import { BrowserRouter, Route, Routes } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import "./index.css";
-import SearchPage from "./SearchPage.tsx";
+import SearchPage from "./routes/SearchPage.tsx";
 
 const queryClient = new QueryClient();
 
