@@ -1,12 +1,16 @@
+import PageLayout from "../components/PageLayout";
 import SearchInput from "../components/SearchInput";
 
 const SearchPage = () => {
   return (
     <>
-      <h1>Github Reporistory Search by adora 🐖</h1>
-      <p>Search your github repo now</p>
+      <PageLayout>
+        <h1 className="text-4xl font-semibold">
+          Github Repository Search by adora 🐖
+        </h1>
 
-      <SearchInput />
+        <SearchInput />
+      </PageLayout>
     </>
   );
 };
