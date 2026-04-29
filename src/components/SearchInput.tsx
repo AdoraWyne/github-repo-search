@@ -1,14 +1,33 @@
+import { useState } from "react";
+
 const SearchInput: React.FC = () => {
+  const [value, setValue] = useState<string>("");
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value);
+  };
+
+  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    alert("query submitted: " + value.trim());
+  };
+
   return (
-    <form>
+    <form onSubmit={handleSubmit}>
       <input
         className="border border-gray-300 rounded-sm p-2 w-full bg-pink-50 my-4"
-        type="text"
         id="search-query"
         name="search-query"
+        onChange={handleChange}
+        type="text"
+        value={value}
       />
       <br />
-      <button className="border border-gray-300 rounded-sm p-2" type="submit">
+      <button
+        className="border border-gray-300 rounded-sm p-2"
+        disabled={!value}
+        type="submit"
+      >
         Submit
       </button>
     </form>
