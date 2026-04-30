@@ -8,14 +8,22 @@ import SearchPage from "./routes/SearchPage.tsx";
 
 const queryClient = new QueryClient();
 
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<SearchPage />} />
-        </Routes>
-      </BrowserRouter>
-    </QueryClientProvider>
-  </StrictMode>,
-);
+async function enableMocking() {
+  if (!import.meta.env.DEV) return;
+  const { worker } = await import("./mocks/browser");
+  return worker.start();
+}
+
+enableMocking().then(() => {
+  createRoot(document.getElementById("root")!).render(
+    <StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<SearchPage />} />
+          </Routes>
+        </BrowserRouter>
+      </QueryClientProvider>
+    </StrictMode>,
+  );
+});
