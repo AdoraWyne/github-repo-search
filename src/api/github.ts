@@ -29,6 +29,15 @@ export const fetchRepoSearch = async (
   return res.json();
 };
 
-// Ask
-// - res.json -> Promise<any>
-// - fetchRepoSearch -> Promise<SearchResponse>
+// Comment: this could be a potential bug
+// Claude chat: https://claude.ai/chat/ffe51ab3-edec-4949-80d4-cc1015ad1583
+
+/**
+ * Promise<any> from res.json() and Promise<SearchRepo> from the fetchRepoSearch function.
+ *
+ * This could be a potential bug, because what if res.json return something does not match with SearchRepo type, TS will trust it but not verify because any matches with any type including SearchRepo type
+ *
+ * so compiler will not able to catch it and we only know during runtime.
+ *
+ * Unless we use define a schema, i.e. Zod for res.json so it will check when res.json returns and the schema able to return some sort of errors.
+ */
