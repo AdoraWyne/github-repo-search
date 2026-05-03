@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useUrlSearchState } from "../hooks/useUrlSearchState";
 
-const SearchInput: React.FC = () => {
+const SearchInput = () => {
   const { q, setQueryAndResetPage } = useUrlSearchState();
   const [value, setValue] = useState<string>(q);
 
