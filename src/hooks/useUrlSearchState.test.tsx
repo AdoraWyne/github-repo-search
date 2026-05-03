@@ -21,4 +21,15 @@ describe("useUrlSearchState", () => {
     expect(result.current.per_page).toBe(10);
     expect(result.current.sort).toBe("best-match");
   });
+
+  it("reads the existing params correctly", () => {
+    const { result } = renderHook(() => useUrlSearchState(), {
+      wrapper: wrapperWithUrl("/?q=react&page=2&per_page=20&sort=stars"),
+    });
+
+    expect(result.current.q).toBe("react");
+    expect(result.current.page).toBe(2);
+    expect(result.current.per_page).toBe(20);
+    expect(result.current.sort).toBe("stars");
+  });
 });
