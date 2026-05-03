@@ -6,7 +6,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./index.css";
 import SearchPage from "./routes/SearchPage.tsx";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false, // will not refetch when user back to the tab
+    },
+  },
+});
 
 async function enableMocking() {
   if (!import.meta.env.DEV) return;
