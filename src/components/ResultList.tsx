@@ -6,7 +6,7 @@ const ResultList: React.FC = () => {
   const { data } = useRepoSearch({ q, page, per_page, sort });
 
   if (!q.trim()) {
-    return <p>What do you would like to search?</p>;
+    return <p>What do you want to search?</p>;
   }
 
   if (data && data.items.length === 0) {
