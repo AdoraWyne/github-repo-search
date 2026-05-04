@@ -11,7 +11,9 @@ const SearchInput = () => {
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setQueryAndResetPage(value.trim());
+    const trimmed = value.trim();
+    if (!trimmed) return;
+    setQueryAndResetPage(trimmed);
   };
 
   return (
