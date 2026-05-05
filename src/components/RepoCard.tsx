@@ -42,6 +42,17 @@ export const RepoCard = ({
         <div className="mt-2">
           <span>{description}</span>
         </div>
+
+        {/* Footer */}
+        <div className="mt-2">
+          <ul className="flex text-gray-500 text-sm">
+            <li>{language}</li>
+            <span className="mx-2">.</span>
+            <li>{stargazers_count} stars</li>
+            <span className="mx-2">.</span>
+            <li>{updated_at}</li>
+          </ul>
+        </div>
       </div>
     </>
   );
