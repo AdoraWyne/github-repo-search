@@ -46,8 +46,12 @@ export const RepoCard = ({
         {/* Footer */}
         <div className="mt-2">
           <ul className="flex text-gray-500 text-sm">
-            <li>{language}</li>
-            <span className="mx-2">.</span>
+            {language && (
+              <>
+                <li>{language}</li>
+                <span className="mx-2">.</span>
+              </>
+            )}
             <li>{stargazers_count} stars</li>
             <span className="mx-2">.</span>
             <li>{updated_at}</li>
