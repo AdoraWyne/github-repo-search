@@ -12,7 +12,6 @@ export interface RepoCardProps {
 }
 
 export const RepoCard = ({
-  id,
   full_name,
   description,
   owner,
