@@ -19,14 +19,14 @@ export function relativeTime(dateNow: number, updatedAtTime: string): string {
 
   // if more than 7 days, just returns the date itself
   if (diffObj.days >= 7)
-    return new Date(updatedAtTime).toLocaleDateString("en-AU", {
+    return `Updated ${new Date(updatedAtTime).toLocaleDateString("en-AU", {
       day: "numeric",
       month: "long",
       year: "numeric",
-    });
+    })}`;
 
   // otherwise, returns the days/hours/mins
-  return convertPlaceholder(diffObj);
+  return `Updated ${convertPlaceholder(diffObj)} ago`;
 }
 
 function convertMs(ms: number): TimeDiff {
