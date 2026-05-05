@@ -21,5 +21,9 @@ export const RepoCard = ({
   language,
   updated_at,
 }: RepoCardProps) => {
-  return <></>;
+  return (
+    <>
+      <div className="border-1 border-solid border-pink-300 rounded-md p-4"></div>
+    </>
+  );
 };
