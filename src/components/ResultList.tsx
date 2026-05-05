@@ -1,5 +1,11 @@
 import { useRepoSearch } from "../hooks/useRepoSearch";
 import { useUrlSearchState } from "../hooks/useUrlSearchState";
+import { RepoCard } from "./RepoCard";
+import { relativeTime } from "../utils/relativeTime";
+
+// testing ---
+import type { RepoCardProps } from "./RepoCard";
+// ---
 
 const ResultList: React.FC = () => {
   const { q, page, per_page, sort } = useUrlSearchState();
@@ -12,6 +18,22 @@ const ResultList: React.FC = () => {
   if (data && data.items.length === 0) {
     return <p>No repositories found for "{q}"</p>;
   }
+  console.log("adora data: ", data);
+
+  const testingData: RepoCardProps = {
+    id: 10270250,
+    full_name: "facebook/react",
+    description: "The library for web and native user interfaces.",
+    owner: {
+      avatar_url: "https://avatars.githubusercontent.com/u/69631?v=4",
+    },
+    html_url: "https://github.com/facebook/react",
+    updated_at: "2026-04-30T16:42:54Z",
+    stargazers_count: 244772,
+    language: "JavaScript",
+  };
+
+  const formattedRelativeTime = relativeTime(testingData.updated_at);
 
   return (
     <>
@@ -25,6 +47,17 @@ const ResultList: React.FC = () => {
           );
         })}
       </ul>
+
+      <hr />
+      <RepoCard
+        full_name={testingData.full_name}
+        description={testingData.description}
+        owner={testingData.owner}
+        html_url={testingData.html_url}
+        stargazers_count={testingData.stargazers_count}
+        language={testingData.language}
+        updated_at={formattedRelativeTime}
+      />
     </>
   );
 };
