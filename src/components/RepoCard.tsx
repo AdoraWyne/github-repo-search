@@ -37,6 +37,11 @@ export const RepoCard = ({
             </a>
           </span>
         </div>
+
+        {/* Description */}
+        <div className="mt-2">
+          <span>{description}</span>
+        </div>
       </div>
     </>
   );
