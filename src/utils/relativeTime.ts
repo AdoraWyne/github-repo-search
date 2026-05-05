@@ -1,3 +1,9 @@
+interface TimeDiff {
+  days: number;
+  hours: number;
+  minutes: number;
+}
+
 export function relativeTime(dateNow: number, updatedAtTime: string): string {
   // find out the diff in epoch ms
   const updatedAtDateEpochMs = Date.parse(updatedAtTime);
@@ -5,9 +11,6 @@ export function relativeTime(dateNow: number, updatedAtTime: string): string {
 
   // convert diff into days, hours, mins object
   const diffObj = convertMs(diff);
-
-  console.log("diff: ", diff);
-  console.log("diffObj: ", diffObj);
 
   // if more than 7 days, just returns the date itself
   if (diffObj.days >= 7)
@@ -21,7 +24,7 @@ export function relativeTime(dateNow: number, updatedAtTime: string): string {
   return convertPlaceholder(diffObj);
 }
 
-function convertMs(ms: number): Record<string, number> {
+function convertMs(ms: number): TimeDiff {
   const days = Math.floor(ms / (24 * 60 * 60 * 1000));
   const hours = Math.floor((ms % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
   const minutes = Math.floor((ms % (60 * 60 * 1000)) / (60 * 1000));
@@ -29,7 +32,7 @@ function convertMs(ms: number): Record<string, number> {
   return { days, hours, minutes };
 }
 
-function convertPlaceholder(diffObject: Record<string, number>): string {
+function convertPlaceholder(diffObject: TimeDiff): string {
   if (
     diffObject.days === 0 &&
     diffObject.hours === 0 &&
