@@ -23,7 +23,21 @@ export const RepoCard = ({
 }: RepoCardProps) => {
   return (
     <>
-      <div className="border-1 border-solid border-pink-300 rounded-md p-4"></div>
+      <div className="border-1 border-solid border-pink-300 rounded-md p-4">
+        {/* Header */}
+        <div className="flex items-center">
+          <img src={owner?.avatar_url} className="w-7 h-7 inline mr-2" />
+          <span>
+            <a
+              href={html_url}
+              target="_blank"
+              className="text-pink-500 text-lg font-semibold"
+            >
+              {full_name}
+            </a>
+          </span>
+        </div>
+      </div>
     </>
   );
 };
