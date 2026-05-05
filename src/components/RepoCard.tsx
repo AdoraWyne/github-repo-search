@@ -1,7 +1,6 @@
 import type { Owner } from "../types/github";
 
 export interface RepoCardProps {
-  id: number;
   full_name: string;
   description: string | null;
   owner?: Owner;
