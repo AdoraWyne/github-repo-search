@@ -55,6 +55,11 @@ describe("relativeTimeFn", () => {
       updatedAtTime: "2025-04-30T16:42:54Z",
       output: "1 May 2025",
     },
+    {
+      dateNow: DATE_NOW,
+      updatedAtTime: "2026-05-05T11:00:00Z", // 1 hour in the future
+      output: "Repo is updated in the future time.",
+    },
   ];
 
   TEST_CASES.forEach(({ dateNow, updatedAtTime, output }) => {

@@ -33,6 +33,11 @@ function convertMs(ms: number): TimeDiff {
 }
 
 function convertPlaceholder(diffObject: TimeDiff): string {
+  // Guard against negatiev diff
+  if (diffObject.days < 0 || diffObject.hours < 0 || diffObject.minutes < 0) {
+    return "Repo is updated in the future time.";
+  }
+
   if (
     diffObject.days === 0 &&
     diffObject.hours === 0 &&
