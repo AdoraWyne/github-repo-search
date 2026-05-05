@@ -14,16 +14,18 @@ const ResultList: React.FC = () => {
   }
 
   return (
-    <ul>
-      {data?.items.map(({ id, full_name, description }) => {
-        return (
-          <li key={id} className="my-4">
-            <p>{full_name}</p>
-            <p>{description}</p>
-          </li>
-        );
-      })}
-    </ul>
+    <>
+      <ul>
+        {data?.items.map(({ id, full_name, description }) => {
+          return (
+            <li key={id} className="my-4">
+              <p>{full_name}</p>
+              <p>{description}</p>
+            </li>
+          );
+        })}
+      </ul>
+    </>
   );
 };
 
