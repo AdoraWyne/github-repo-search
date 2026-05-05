@@ -11,6 +11,12 @@ describe("relativeTimeFn", () => {
       updatedAtTime: "2026-05-05T09:59:30Z",
       output: "1 minute",
     },
+    // exact 1 min
+    {
+      dateNow: DATE_NOW,
+      updatedAtTime: "2026-05-05T09:59:00Z",
+      output: "1 minute",
+    },
     // within 1 hour: show minutes
     // diff: 3540s (59mins)
     {
