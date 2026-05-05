@@ -7,7 +7,7 @@ export interface RepoCardProps {
   html_url: string;
   stargazers_count: number;
   language: string | null;
-  updated_at: string;
+  updatedLabel: string;
 }
 
 export const RepoCard = ({
@@ -17,7 +17,7 @@ export const RepoCard = ({
   html_url,
   stargazers_count,
   language,
-  updated_at,
+  updatedLabel,
 }: RepoCardProps) => {
   return (
     <>
@@ -54,7 +54,7 @@ export const RepoCard = ({
             )}
             <li>{stargazers_count} stars</li>
             <span className="mx-2">.</span>
-            <li>{updated_at}</li>
+            <li>{updatedLabel}</li>
           </ul>
         </div>
       </div>

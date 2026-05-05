@@ -9,45 +9,45 @@ describe("relativeTimeFn", () => {
     {
       dateNow: DATE_NOW,
       updatedAtTime: "2026-05-05T09:59:30Z",
-      output: "1 minute",
+      output: "1 minute ago",
     },
     // exact 1 min
     {
       dateNow: DATE_NOW,
       updatedAtTime: "2026-05-05T09:59:00Z",
-      output: "1 minute",
+      output: "1 minute ago",
     },
     // within 1 hour: show minutes
     // diff: 3540s (59mins)
     {
       dateNow: DATE_NOW,
       updatedAtTime: "2026-05-05T09:01:00Z",
-      output: "59 minutes",
+      output: "59 minutes ago",
     },
     // at exactly 1 hour: show hours
     {
       dateNow: DATE_NOW,
       updatedAtTime: "2026-05-05T09:00:00Z",
-      output: "1 hour",
+      output: "1 hour ago",
     },
     // within 24 hours: show hours
     // diff: 6 hrs 52 mins
     {
       dateNow: DATE_NOW,
       updatedAtTime: "2026-05-05T03:07:14.036Z",
-      output: "6 hours",
+      output: "6 hours ago",
     },
     // at exactly 24 hours: show days
     {
       dateNow: DATE_NOW,
       updatedAtTime: "2026-05-04T10:00:00Z",
-      output: "1 day",
+      output: "1 day ago",
     },
     // within 7 days: show days
     {
       dateNow: DATE_NOW,
       updatedAtTime: "2026-05-01T10:00:00Z",
-      output: "4 days",
+      output: "4 days ago",
     },
     // at 7 days: show formatted date
     {
