@@ -39,9 +39,11 @@ export const RepoCard = ({
         </div>
 
         {/* Description */}
-        <div className="mt-2">
-          <span>{description}</span>
-        </div>
+        {description && (
+          <div className="mt-2">
+            <span>{description}</span>
+          </div>
+        )}
 
         {/* Footer */}
         <div className="mt-2">
