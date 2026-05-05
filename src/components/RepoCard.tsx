@@ -48,7 +48,7 @@ export const RepoCard = ({
 
         {/* Footer */}
         <div className="mt-2">
-          <ul className="flex text-gray-500 text-sm">
+          <ul className="flex text-gray-500 text-sm items-center flex-wrap">
             {language && (
               <>
                 <li>{language}</li>
