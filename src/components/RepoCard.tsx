@@ -1,4 +1,5 @@
 import type { Owner } from "../types/github";
+import { formatCompactNumber } from "../utils/formatCompactNumber";
 
 export interface RepoCardProps {
   full_name: string;
@@ -19,6 +20,8 @@ export const RepoCard = ({
   language,
   updatedLabel,
 }: RepoCardProps) => {
+  const starsLabel = `${formatCompactNumber(stargazers_count)} ${stargazers_count === 1 ? "star" : "stars"}`;
+
   return (
     <>
       <div className="border-1 border-solid border-pink-300 rounded-md p-4">
@@ -52,7 +55,7 @@ export const RepoCard = ({
                 <span className="mx-2">.</span>
               </>
             )}
-            <li>{stargazers_count} stars</li>
+            <li>{starsLabel}</li>
             <span className="mx-2">.</span>
             <li>{updatedLabel}</li>
           </ul>
