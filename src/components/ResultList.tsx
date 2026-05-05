@@ -25,7 +25,6 @@ const ResultList: React.FC = () => {
     description: "The library for web and native user interfaces.",
     owner: {
       avatar_url: "https://avatars.githubusercontent.com/u/69631?v=4",
-      url: "https://api.github.com/users/facebook",
     },
     html_url: "https://github.com/facebook/react",
     updated_at: "2026-04-30T16:42:54Z",

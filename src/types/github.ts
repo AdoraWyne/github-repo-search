@@ -1,6 +1,5 @@
 export interface Owner {
   avatar_url: string;
-  url: string;
 }
 
 export interface Repo {

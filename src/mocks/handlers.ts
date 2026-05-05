@@ -13,7 +13,6 @@ export const handlers = [
           description: "The library for web and native user interfaces.",
           owner: {
             avatar_url: "https://avatars.githubusercontent.com/u/69631?v=4",
-            url: "https://api.github.com/users/facebook",
           },
           html_url: "https://github.com/facebook/react",
           updated_at: "2026-04-30T16:42:54Z",
@@ -27,7 +26,6 @@ export const handlers = [
             "Cheatsheets for experienced React developers getting started with TypeScript",
           owner: {
             avatar_url: "https://avatars.githubusercontent.com/u/50188264?v=4",
-            url: "https://api.github.com/users/typescript-cheatsheets",
           },
           html_url: "https://github.com/typescript-cheatsheets/react",
           updated_at: "2026-04-30T04:51:00Z",
@@ -41,7 +39,6 @@ export const handlers = [
             " React+webpack+redux+ant design+axios+less全家桶后台管理框架",
           owner: {
             avatar_url: "https://avatars.githubusercontent.com/u/3249653?v=4",
-            url: "https://api.github.com/users/duxianwei520",
           },
           html_url: "https://github.com/duxianwei520/react",
           updated_at: "2026-04-28T10:11:12Z",
@@ -55,7 +52,6 @@ export const handlers = [
             "An implementation of GitHub's Primer Design System using React",
           owner: {
             avatar_url: "https://avatars.githubusercontent.com/u/7143434?v=4",
-            url: "https://api.github.com/users/primer",
           },
           html_url: "https://github.com/primer/react",
           updated_at: "2026-04-30T04:28:57Z",
@@ -68,7 +64,6 @@ export const handlers = [
           description: "React docs in Chinese | React 中文文档翻译",
           owner: {
             avatar_url: "https://avatars.githubusercontent.com/u/4507101?v=4",
-            url: "https://api.github.com/users/discountry",
           },
           html_url: "https://github.com/discountry/react",
           updated_at: "2026-04-22T07:49:45Z",
@@ -82,7 +77,6 @@ export const handlers = [
             "[ICLR 2023] ReAct: Synergizing Reasoning and Acting in Language Models",
           owner: {
             avatar_url: "https://avatars.githubusercontent.com/u/4877252?v=4",
-            url: "https://api.github.com/users/ysymyth",
           },
           html_url: "https://github.com/ysymyth/ReAct",
           updated_at: "2026-04-30T13:27:57Z",
@@ -95,7 +89,6 @@ export const handlers = [
           description: "基于react的企业后台管理开发框架",
           owner: {
             avatar_url: "https://avatars.githubusercontent.com/u/24805142?v=4",
-            url: "https://api.github.com/users/react-redux-antd-es6",
           },
           html_url: "https://github.com/react-redux-antd-es6/react",
           updated_at: "2026-04-28T10:14:39Z",
@@ -109,7 +102,6 @@ export const handlers = [
             'This repository contains all the material for the HackYourFuture module "React.js: Building dynamic UIs with modern JavaScript"',
           owner: {
             avatar_url: "https://avatars.githubusercontent.com/u/20858568?v=4",
-            url: "https://api.github.com/users/HackYourFuture",
           },
           html_url: "https://github.com/HackYourFuture/React",
           updated_at: "2026-04-27T08:01:13Z",
