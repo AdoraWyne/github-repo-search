@@ -2,6 +2,48 @@ import { http, HttpResponse } from "msw";
 import type { SearchResponse } from "../types/github";
 
 export const handlers = [
+  http.get("https://api.github.com/search/repositories", ({ request }) => {
+    const url = new URL(request.url);
+    const q = url.searchParams.get("q");
+    const page = url.searchParams.get("page");
+    const perPage = url.searchParams.get("per_page");
+
+    if (q === "react" && page === "1" && perPage === "2") {
+      return HttpResponse.json<SearchResponse>({
+        total_count: 2,
+        incomplete_results: false,
+        items: [
+          {
+            id: 10270250,
+            full_name: "facebook/react",
+            description: "The library for web and native user interfaces.",
+            owner: {
+              avatar_url: "https://avatars.githubusercontent.com/u/69631?v=4",
+            },
+            html_url: "https://github.com/facebook/react",
+            updated_at: "2026-04-30T16:42:54Z",
+            stargazers_count: 244772,
+            language: "JavaScript",
+          },
+          {
+            id: 135786093,
+            full_name: "typescript-cheatsheets/react",
+            description:
+              "Cheatsheets for experienced React developers getting started with TypeScript",
+            owner: {
+              avatar_url:
+                "https://avatars.githubusercontent.com/u/50188264?v=4",
+            },
+            html_url: "https://github.com/typescript-cheatsheets/react",
+            updated_at: "2026-04-30T04:51:00Z",
+            stargazers_count: 47038,
+            language: "JavaScript",
+          },
+        ],
+      });
+    }
+  }),
+
   http.get("https://api.github.com/search/repositories", () => {
     return HttpResponse.json<SearchResponse>({
       total_count: 66,
