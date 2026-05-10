@@ -8,13 +8,13 @@ export const handlers = [
     const page = url.searchParams.get("page");
     const perPage = url.searchParams.get("per_page");
 
-    if (q === "react" && page === "1" && perPage === "2") {
+    if (q === "react" && page === "1" && perPage === "10") {
       return HttpResponse.json<SearchResponse>({
-        total_count: 2,
+        total_count: 10,
         incomplete_results: false,
         items: [
           {
-            id: 10270250,
+            id: 102702501,
             full_name: "facebook/react",
             description: "The library for web and native user interfaces.",
             owner: {
@@ -26,7 +26,111 @@ export const handlers = [
             language: "JavaScript",
           },
           {
-            id: 135786093,
+            id: 1357860932,
+            full_name: "typescript-cheatsheets/react",
+            description:
+              "Cheatsheets for experienced React developers getting started with TypeScript",
+            owner: {
+              avatar_url:
+                "https://avatars.githubusercontent.com/u/50188264?v=4",
+            },
+            html_url: "https://github.com/typescript-cheatsheets/react",
+            updated_at: "2026-04-30T04:51:00Z",
+            stargazers_count: 47038,
+            language: "JavaScript",
+          },
+          {
+            id: 102702503,
+            full_name: "facebook/react",
+            description: "The library for web and native user interfaces.",
+            owner: {
+              avatar_url: "https://avatars.githubusercontent.com/u/69631?v=4",
+            },
+            html_url: "https://github.com/facebook/react",
+            updated_at: "2026-04-30T16:42:54Z",
+            stargazers_count: 244772,
+            language: "JavaScript",
+          },
+          {
+            id: 135786094,
+            full_name: "typescript-cheatsheets/react",
+            description:
+              "Cheatsheets for experienced React developers getting started with TypeScript",
+            owner: {
+              avatar_url:
+                "https://avatars.githubusercontent.com/u/50188264?v=4",
+            },
+            html_url: "https://github.com/typescript-cheatsheets/react",
+            updated_at: "2026-04-30T04:51:00Z",
+            stargazers_count: 47038,
+            language: "JavaScript",
+          },
+          {
+            id: 10270255,
+            full_name: "facebook/react",
+            description: "The library for web and native user interfaces.",
+            owner: {
+              avatar_url: "https://avatars.githubusercontent.com/u/69631?v=4",
+            },
+            html_url: "https://github.com/facebook/react",
+            updated_at: "2026-04-30T16:42:54Z",
+            stargazers_count: 244772,
+            language: "JavaScript",
+          },
+          {
+            id: 135786096,
+            full_name: "typescript-cheatsheets/react",
+            description:
+              "Cheatsheets for experienced React developers getting started with TypeScript",
+            owner: {
+              avatar_url:
+                "https://avatars.githubusercontent.com/u/50188264?v=4",
+            },
+            html_url: "https://github.com/typescript-cheatsheets/react",
+            updated_at: "2026-04-30T04:51:00Z",
+            stargazers_count: 47038,
+            language: "JavaScript",
+          },
+          {
+            id: 10270257,
+            full_name: "facebook/react",
+            description: "The library for web and native user interfaces.",
+            owner: {
+              avatar_url: "https://avatars.githubusercontent.com/u/69631?v=4",
+            },
+            html_url: "https://github.com/facebook/react",
+            updated_at: "2026-04-30T16:42:54Z",
+            stargazers_count: 244772,
+            language: "JavaScript",
+          },
+          {
+            id: 1357860938,
+            full_name: "typescript-cheatsheets/react",
+            description:
+              "Cheatsheets for experienced React developers getting started with TypeScript",
+            owner: {
+              avatar_url:
+                "https://avatars.githubusercontent.com/u/50188264?v=4",
+            },
+            html_url: "https://github.com/typescript-cheatsheets/react",
+            updated_at: "2026-04-30T04:51:00Z",
+            stargazers_count: 47038,
+            language: "JavaScript",
+          },
+          {
+            id: 102702509,
+            full_name: "facebook/react",
+            description: "The library for web and native user interfaces.",
+            owner: {
+              avatar_url: "https://avatars.githubusercontent.com/u/69631?v=4",
+            },
+            html_url: "https://github.com/facebook/react",
+            updated_at: "2026-04-30T16:42:54Z",
+            stargazers_count: 244772,
+            language: "JavaScript",
+          },
+          {
+            id: 13578609310,
             full_name: "typescript-cheatsheets/react",
             description:
               "Cheatsheets for experienced React developers getting started with TypeScript",
