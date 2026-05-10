@@ -13,6 +13,8 @@ export const fetchRepoSearch = async (
   // set the params
   const searchParams = new URLSearchParams();
   searchParams.set("q", params.q);
+  searchParams.set("page", String(params.page));
+  searchParams.set("per_page", String(params.per_page));
 
   // construct the API url
   const base = "https://api.github.com/search/repositories";
