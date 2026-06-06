@@ -17,18 +17,18 @@ const range = (start: number, end: number, step = 1) => {
 export const getPageNumbers = (
   current: number,
   max: number,
-): (number | "ellipsis")[] => {
+): (number | "...")[] => {
   // render 1-7
   if (range(1, max).length <= 7) {
     return range(1, max);
-    // if current <=3 at beginning
+    // if current is within first 3 pages at beginning
   } else if (current <= 3) {
-    return [...range(1, current + 1), "ellipsis", max];
-    // if current at less 4 pages
-  } else if (max - current <= 4) {
-    return [1, "ellipsis", ...range(current - 1, max)];
+    return [...range(1, current + 1), "...", max];
+    // if current is within last 3 pages
+  } else if (max - current <= 2) {
+    return [1, "...", ...range(current - 1, max)];
     // anything in between
   } else {
-    return [1, "ellipsis", ...range(current - 1, current + 1), "ellipsis", max];
+    return [1, "...", ...range(current - 1, current + 1), "...", max];
   }
 };
