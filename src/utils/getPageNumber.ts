@@ -21,14 +21,17 @@ export const getPageNumbers = (
   // No truncation needed — render every page
   if (max <= FULL_RANGE_THRESHOLD) {
     return range(1, max);
-    // if current is within first 3 pages at beginning
-  } else if (current <= 3) {
+  }
+  // if current is within first 3 pages at beginning
+  else if (current <= 3) {
     return [...range(1, current + SIBLINGS), "...", max];
-    // if current is within last 3 pages
-  } else if (current >= max - 2) {
+  }
+  // if current is within last 3 pages
+  else if (current >= max - 2) {
     return [1, "...", ...range(current - SIBLINGS, max)];
-    // anything in between
-  } else {
+  }
+  // anything in between
+  else {
     return [
       1,
       "...",
