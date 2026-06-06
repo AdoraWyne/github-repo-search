@@ -7,13 +7,23 @@ const SIBLINGS = 1;
 const range = (start: number, end: number) => {
   const output: number[] = [];
 
-  for (let i = start; i <= end; i += SIBLINGS) {
+  for (let i = start; i <= end; i += 1) {
     output.push(i);
   }
 
   return output;
 };
 
+/**
+ * Returns the page numbers to render in a pagination control,
+ * with "..." indicating skipped ranges.
+ *
+ * Rule:
+ * - Always show first (1) and last (max)
+ * - Show current ± 1
+ * - Insert "..." between gaps
+ * - If max ≤ 7, return the full range (no truncation)
+ */
 export const getPageNumbers = (
   current: number,
   max: number,
@@ -22,7 +32,7 @@ export const getPageNumbers = (
   if (max <= FULL_RANGE_THRESHOLD) {
     return range(1, max);
   }
-  // if current is within first 3 pages at beginning
+  // if current is within first 3 pages
   else if (current <= 3) {
     return [...range(1, current + SIBLINGS), "...", max];
   }
