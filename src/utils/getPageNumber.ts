@@ -1,16 +1,18 @@
 // Always shows first and last; current ± 1; ellipsis between gaps. If max ≤ 7, returns the full range (no truncation needed).
+
+// Full range when truncation is not needed
+const FULL_RANGE_THRESHOLD = 7;
+const SIBLINGS = 1;
+
 const range = (start: number, end: number) => {
   const output: number[] = [];
 
-  for (let i = start; i <= end; i += 1) {
+  for (let i = start; i <= end; i += SIBLINGS) {
     output.push(i);
   }
 
   return output;
 };
-
-// Full range when truncation is not needed
-const FULL_RANGE_THRESHOLD = 7;
 
 export const getPageNumbers = (
   current: number,
@@ -21,12 +23,18 @@ export const getPageNumbers = (
     return range(1, max);
     // if current is within first 3 pages at beginning
   } else if (current <= 3) {
-    return [...range(1, current + 1), "...", max];
+    return [...range(1, current + SIBLINGS), "...", max];
     // if current is within last 3 pages
   } else if (max - current <= 2) {
-    return [1, "...", ...range(current - 1, max)];
+    return [1, "...", ...range(current - SIBLINGS, max)];
     // anything in between
   } else {
-    return [1, "...", ...range(current - 1, current + 1), "...", max];
+    return [
+      1,
+      "...",
+      ...range(current - SIBLINGS, current + SIBLINGS),
+      "...",
+      max,
+    ];
   }
 };
