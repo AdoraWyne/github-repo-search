@@ -25,7 +25,7 @@ export const getPageNumbers = (
   } else if (current <= 3) {
     return [...range(1, current + SIBLINGS), "...", max];
     // if current is within last 3 pages
-  } else if (max - current <= 2) {
+  } else if (current >= max - 2) {
     return [1, "...", ...range(current - SIBLINGS, max)];
     // anything in between
   } else {
