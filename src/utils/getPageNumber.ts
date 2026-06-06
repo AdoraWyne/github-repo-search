@@ -14,12 +14,15 @@ const range = (start: number, end: number, step = 1) => {
   return output;
 };
 
+// Full range when where truncation is not needed
+const FULL_RANGE_THRESHOLD = 7;
+
 export const getPageNumbers = (
   current: number,
   max: number,
 ): (number | "...")[] => {
   // render 1-7
-  if (range(1, max).length <= 7) {
+  if (max <= FULL_RANGE_THRESHOLD) {
     return range(1, max);
     // if current is within first 3 pages at beginning
   } else if (current <= 3) {
