@@ -24,7 +24,7 @@ export const RepoCard = ({
 
   return (
     <>
-      <div className="border-1 border-solid border-pink-300 rounded-md p-4">
+      <div className="border border-solid border-pink-300 rounded-md p-4">
         {/* Header */}
         <div className="flex items-center">
           <img src={owner?.avatar_url} className="w-7 h-7 inline mr-2" />
