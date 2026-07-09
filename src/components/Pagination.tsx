@@ -1,6 +1,6 @@
 import { getPageNumbers } from "../utils/getPageNumber";
 
-type PaginationProps = {
+export type PaginationProps = {
   currentPage: number;
   maxPage: number;
   onPageChange: (v: number) => void;

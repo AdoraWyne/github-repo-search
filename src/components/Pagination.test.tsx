@@ -1,15 +1,26 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
-import Pagination from "./Pagination";
+import Pagination, { type PaginationProps } from "./Pagination";
+
+const renderPagination = (props: Partial<PaginationProps> = {}) => {
+  const user = userEvent.setup();
+  const onPageChange = vi.fn();
+  render(
+    <Pagination
+      currentPage={1}
+      maxPage={10}
+      onPageChange={onPageChange}
+      {...props}
+    />,
+  );
+
+  return { user, onPageChange };
+};
 
 describe("Pagination", () => {
   it("calls onPageChange with the clicked page number", async () => {
-    const user = userEvent.setup();
-    const onPageChange = vi.fn();
-    render(
-      <Pagination currentPage={1} maxPage={10} onPageChange={onPageChange} />,
-    );
+    const { user, onPageChange } = renderPagination();
 
     const pageButton = screen.getByRole("button", { name: "Page 2" });
     await user.click(pageButton);
@@ -19,10 +30,7 @@ describe("Pagination", () => {
   });
 
   it("disables Previous button when on page 1", () => {
-    const onPageChange = vi.fn();
-    render(
-      <Pagination currentPage={1} maxPage={10} onPageChange={onPageChange} />,
-    );
+    renderPagination();
 
     const previousButton = screen.getByRole("button", { name: /previous/i });
 
@@ -30,10 +38,7 @@ describe("Pagination", () => {
   });
 
   it("disables Next button when on the last page", () => {
-    const onPageChange = vi.fn();
-    render(
-      <Pagination currentPage={10} maxPage={10} onPageChange={onPageChange} />,
-    );
+    renderPagination({ currentPage: 10 });
 
     const nextButton = screen.getByRole("button", { name: /next/i });
 
@@ -41,10 +46,7 @@ describe("Pagination", () => {
   });
 
   it("marks the active page with aria-current='page'", () => {
-    const onPageChange = vi.fn();
-    render(
-      <Pagination currentPage={3} maxPage={10} onPageChange={onPageChange} />,
-    );
+    renderPagination({ currentPage: 3 });
 
     const pageButton = screen.getByRole("button", { name: "Page 3" });
 
@@ -52,11 +54,7 @@ describe("Pagination", () => {
   });
 
   it("does not call onPageChange when clicking the current page", async () => {
-    const user = userEvent.setup();
-    const onPageChange = vi.fn();
-    render(
-      <Pagination currentPage={1} maxPage={10} onPageChange={onPageChange} />,
-    );
+    const { user, onPageChange } = renderPagination();
 
     const pageButton = screen.getByRole("button", { name: "Page 1" });
     await user.click(pageButton);
