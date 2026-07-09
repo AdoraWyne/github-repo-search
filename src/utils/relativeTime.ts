@@ -4,6 +4,25 @@ interface TimeDiff {
   minutes: number;
 }
 
+/**
+ * Formats how long ago a repo was updated as a human-readable string,
+ * relative to a reference time. Within 7 days it counts down in the
+ * largest whole unit (days → hours → minutes); beyond that it falls back
+ * to the absolute date in en-AU locale.
+ *
+ * @param dateNow - the reference time, in epoch milliseconds (e.g. Date.now())
+ * @param updatedAtTime - the repo's last-updated timestamp, as an ISO date string
+ * @returns a display string such as "Updated 3 days ago"
+ *
+ * @example
+ *   const now = Date.parse("2026-07-09T12:00:00Z");
+ *   relativeTime(now, "2026-07-09T11:59:30Z"); // "Updated less than 1 minute ago"
+ *   relativeTime(now, "2026-07-09T11:45:00Z"); // "Updated 15 minutes ago"
+ *   relativeTime(now, "2026-07-09T09:00:00Z"); // "Updated 3 hours ago"
+ *   relativeTime(now, "2026-07-06T12:00:00Z"); // "Updated 3 days ago"
+ *   relativeTime(now, "2026-01-01T12:00:00Z"); // "Updated 1 January 2026"
+ *   relativeTime(now, "2026-07-10T12:00:00Z"); // "Repo is updated in the future time."
+ */
 export function relativeTime(dateNow: number, updatedAtTime: string): string {
   // find out the diff in epoch ms
   const updatedAtDateEpochMs = Date.parse(updatedAtTime);
@@ -38,6 +57,7 @@ function convertMs(ms: number): TimeDiff {
 }
 
 function convertPlaceholder(diffObject: TimeDiff): string {
+  // less than 60 minutes
   if (
     diffObject.days === 0 &&
     diffObject.hours === 0 &&
@@ -45,13 +65,18 @@ function convertPlaceholder(diffObject: TimeDiff): string {
   ) {
     const label = diffObject.minutes === 1 ? "minute" : "minutes";
     return `${diffObject.minutes} ${label}`;
-  } else if (diffObject.days === 0 && diffObject.hours > 0) {
+  }
+  // less than 24 hours
+  else if (diffObject.days === 0 && diffObject.hours > 0) {
     const label = diffObject.hours === 1 ? "hour" : "hours";
     return `${diffObject.hours} ${label}`;
-  } else if (diffObject.days > 0) {
+  }
+  // less than 7 days
+  else if (diffObject.days > 0) {
     const label = diffObject.days === 1 ? "day" : "days";
     return `${diffObject.days} ${label}`;
+    // less than 1 minute
   } else {
-    return "1 minute";
+    return "less than 1 minute";
   }
 }
