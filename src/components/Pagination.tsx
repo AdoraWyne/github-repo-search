@@ -14,7 +14,7 @@ const Pagination = ({
   const pages = getPageNumbers(currentPage, maxPage);
 
   return (
-    <div>
+    <nav aria-label="Pagination">
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
@@ -22,12 +22,19 @@ const Pagination = ({
         Previous
       </button>
       {pages.map((page, i) => {
-        if (page === "...") return <span key={`ellipsis-${i}`}>{page}</span>;
+        if (page === "...")
+          return (
+            <span key={`ellipsis-${i}`} aria-hidden="true">
+              {page}
+            </span>
+          );
         return (
           <button
             key={page}
             onClick={() => onPageChange(page)}
             disabled={page === currentPage}
+            aria-label={`Page ${page}`}
+            aria-current={page === currentPage ? "page" : undefined}
             className="m-2"
           >
             {page}
@@ -40,7 +47,7 @@ const Pagination = ({
       >
         Next
       </button>
-    </div>
+    </nav>
   );
 };
 
