@@ -1,73 +1,70 @@
-# React + TypeScript + Vite
+# TODO:
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Goals:
 
-Currently, two official plugins are available:
+- Trying to return the mocked data from MSW handlers with q=react&page=1&per_page=2.
+- Problem at src/components/SearchInput.tsx, line 17 and line 18:
+  ```ts
+  setQueryAndResetPage(trimmed);
+  setPerPage(2);
+  ```
+- setPage(2) will overwrite setQueryAndResetPage(trimmed), so when I hit submit, it gives me back this url: `/?per_page=2`, instead of `/?q=react&page=1&per_page=2`
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+# For URL Search Params
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+I need to figure out what are the user stories for the URL params.
 
-## Expanding the ESLint configuration
+Bug:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- If I'm on "/?q=jay&page=1&per_page=2", and I wanna search new value and I put "adora" into the input box, it will only update `q` from "jay" to "adora".
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+This is my handleSubmit function:
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```ts
+const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  const trimmed = value.trim();
+  if (!trimmed) return;
+  // TODO: here is the problem
+  // updateParams({ q: trimmed, page: "1", per_page: "2" });
+  setQueryAndResetPage(trimmed);
+};
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```ts
+const setQueryAndResetPage = (v: string) => updateParams({ q: v, page: "1" });
 ```
+
+```ts
+const updateParams = (updates: Record<string, string>) => {
+  setSearchParams((prev) => {
+    console.log("adora prev: ", prev.toString());
+    const next = new URLSearchParams(prev);
+    for (const [key, value] of Object.entries(updates)) {
+      next.set(key, value);
+    }
+    return next;
+  });
+};
+```
+
+The problem of current is, it will take the previous state. so if you want to have a new search, it will carry the pre states. unless, we do a reset.
+but I need to make it clear how do the user stories like for URL params
+
+# User Stories
+
+- when on “/“, shows nothing on the page cuz q is empty.
+  - page will be = 1
+  - per_page will be = 10
+  - sort will be "best-match"
+- when on “/?q=react”, we show 10 items per page and on page 1 and sort with best match cuz default.
+- and when user on “/?q=react”, and the user go to page 2 so the query string is “/?q=react&page=2&per_page=10”.
+- but if user update q value again, it should reset the q and page but per_page and sort should remain the same value.
+
+# Small note
+
+- I came back to this project after a 23-day holiday, I forgot what I did! I just done with the `getPageNumber` function.
+- I should have enforced myself to note down what I have done and what need to do next.
+- But because of I forgot what I did, I needed to understand the `getPageNumber` function I wrote few weeks ago. I found a bug in it. Have fixed it.
