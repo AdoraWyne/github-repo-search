@@ -24,8 +24,9 @@ export const useUrlSearchState = () => {
 
   const setQuery = (v: string) => updateParams({ q: v });
   const setPage = (v: number) => updateParams({ page: String(v) });
-  const setPerPage = (v: number) => updateParams({ per_page: String(v) });
-  const setSort = (v: SortOption) => updateParams({ sort: v });
+  const setPerPage = (v: number) =>
+    updateParams({ per_page: String(v), page: "1" });
+  const setSort = (v: SortOption) => updateParams({ sort: v, page: "1" });
   const setQueryAndResetPage = (v: string) => updateParams({ q: v, page: "1" });
 
   return {

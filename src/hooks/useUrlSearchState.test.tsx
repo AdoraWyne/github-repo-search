@@ -103,3 +103,58 @@ describe("setQueryAndResetPage", () => {
     expect(result.current.per_page).toBe(20);
   });
 });
+
+// See docs/url-state-reset-behaviour.md for the full change matrix.
+// Changing a filter that reshapes the result set (sort, per_page) resets page → 1;
+// navigating pages leaves every other param untouched.
+
+describe("setSort", () => {
+  it("updates sort, resets page to 1, and preserves q and per_page", () => {
+    const { result } = renderHook(() => useUrlSearchState(), {
+      wrapper: wrapperWithUrl("/?q=react&page=5&per_page=20&sort=best-match"),
+    });
+
+    act(() => {
+      result.current.setSort("stars");
+    });
+
+    expect(result.current.sort).toBe("stars"); // new
+    expect(result.current.page).toBe(1); // reset → 1
+    expect(result.current.q).toBe("react"); // keep
+    expect(result.current.per_page).toBe(20); // keep
+  });
+});
+
+describe("setPerPage", () => {
+  it("updates per_page, resets page to 1, and preserves q and sort", () => {
+    const { result } = renderHook(() => useUrlSearchState(), {
+      wrapper: wrapperWithUrl("/?q=react&page=5&per_page=10&sort=stars"),
+    });
+
+    act(() => {
+      result.current.setPerPage(50);
+    });
+
+    expect(result.current.per_page).toBe(50); // new
+    expect(result.current.page).toBe(1); // reset → 1
+    expect(result.current.q).toBe("react"); // keep
+    expect(result.current.sort).toBe("stars"); // keep
+  });
+});
+
+describe("setPage (navigation, not a filter change)", () => {
+  it("updates page and preserves q, per_page, and sort (no reset)", () => {
+    const { result } = renderHook(() => useUrlSearchState(), {
+      wrapper: wrapperWithUrl("/?q=react&page=2&per_page=20&sort=stars"),
+    });
+
+    act(() => {
+      result.current.setPage(4);
+    });
+
+    expect(result.current.page).toBe(4); // new
+    expect(result.current.q).toBe("react"); // keep
+    expect(result.current.per_page).toBe(20); // keep
+    expect(result.current.sort).toBe("stars"); // keep
+  });
+});
