@@ -1,6 +1,6 @@
 import { useSearchParams } from "react-router";
 
-export type SortOption = "best-match" | "stars" | "forks" | "updated";
+export type SortOption = "best-match" | "stars" | "updated";
 
 export const useUrlSearchState = () => {
   const [searchParams, setSearchParams] = useSearchParams();

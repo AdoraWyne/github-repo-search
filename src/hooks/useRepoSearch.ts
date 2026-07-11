@@ -5,7 +5,7 @@ interface UseRepoSearchParams {
   q: string;
   page: number;
   per_page: number;
-  sort: "best-match" | "stars" | "forks" | "updated";
+  sort: "best-match" | "stars" | "updated";
 }
 
 export const useRepoSearch = ({
