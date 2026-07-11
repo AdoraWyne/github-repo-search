@@ -15,7 +15,13 @@ export const fetchRepoSearch = async (
   searchParams.set("q", params.q);
   searchParams.set("page", String(params.page));
   searchParams.set("per_page", String(params.per_page));
-  // TODO: need a sort
+  if (
+    params.sort === "stars" ||
+    params.sort === "forks" ||
+    params.sort === "updated"
+  ) {
+    searchParams.set("sort", params.sort);
+  }
 
   // construct the API url
   const base = "https://api.github.com/search/repositories";
