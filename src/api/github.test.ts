@@ -93,12 +93,14 @@ describe("fetchRepoSearch", () => {
       expect(url.searchParams.has("sort")).toBe(false);
     });
 
-    // Scenario 2: an allowed value is forwarded verbatim as ?sort=<value>.
-    it("sends ?sort=stars for an allowed value", async () => {
-      const url = await captureRequestUrl({ ...base, sort: "stars" });
+    it.each(["stars", "updated"] as const)(
+      "sends ?sort=%s for the allowed value %s",
+      async (sort) => {
+        const url = await captureRequestUrl({ ...base, sort });
 
-      expect(url.searchParams.get("sort")).toBe("stars");
-    });
+        expect(url.searchParams.get("sort")).toBe(sort);
+      },
+    );
 
     // Scenario 3: an invalid value (e.g. a hand-edited ?sort=banana) is untrusted
     // input — validate at the boundary and fall back to best-match (omit the param)
