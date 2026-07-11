@@ -7,6 +7,12 @@ export interface FetchRepoSearchParams {
   sort: "best-match" | "stars" | "forks" | "updated";
 }
 
+const SORTABLE_VALUES: readonly FetchRepoSearchParams["sort"][] = [
+  "stars",
+  "forks",
+  "updated",
+];
+
 export const fetchRepoSearch = async (
   params: FetchRepoSearchParams,
 ): Promise<SearchResponse> => {
@@ -15,11 +21,7 @@ export const fetchRepoSearch = async (
   searchParams.set("q", params.q);
   searchParams.set("page", String(params.page));
   searchParams.set("per_page", String(params.per_page));
-  if (
-    params.sort === "stars" ||
-    params.sort === "forks" ||
-    params.sort === "updated"
-  ) {
+  if (SORTABLE_VALUES.includes(params.sort)) {
     searchParams.set("sort", params.sort);
   }
 
