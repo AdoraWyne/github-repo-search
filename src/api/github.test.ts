@@ -1,14 +1,14 @@
 import { describe, it, expect } from "vitest";
 import { http, HttpResponse } from "msw";
 import { server } from "../mocks/node";
-import { fetchRepoSearch } from "./github";
+import { fetchRepoSearch, type FetchRepoSearchParams } from "./github";
 import { ApiError } from "../types/github";
-
-type FetchParams = Parameters<typeof fetchRepoSearch>[0];
 
 // Spin up a one-off handler that captures the outgoing request URL, call
 // fetchRepoSearch, and hand back the parsed URL so tests can assert on params.
-const captureRequestUrl = async (params: FetchParams): Promise<URL> => {
+const captureRequestUrl = async (
+  params: FetchRepoSearchParams,
+): Promise<URL> => {
   let capturedUrl = "";
 
   server.use(
@@ -78,7 +78,7 @@ describe("fetchRepoSearch", () => {
   });
 
   describe("sort param mapping", () => {
-    const base: FetchParams = {
+    const base: FetchRepoSearchParams = {
       q: "react",
       page: 1,
       per_page: 10,
@@ -105,7 +105,7 @@ describe("fetchRepoSearch", () => {
     // rather than forwarding a bad value to GitHub.
     it("falls back to best-match (omits sort) for an invalid value", async () => {
       // Double-cast to slip a value past the union and simulate a corrupted URL.
-      const invalidSort = "banana" as unknown as FetchParams["sort"];
+      const invalidSort = "banana" as unknown as FetchRepoSearchParams["sort"];
 
       const url = await captureRequestUrl({ ...base, sort: invalidSort });
 

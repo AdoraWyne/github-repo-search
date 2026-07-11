@@ -1,6 +1,6 @@
 import { ApiError, type SearchResponse } from "../types/github";
 
-interface FetchRepoSearchParams {
+export interface FetchRepoSearchParams {
   q: string;
   page: number;
   per_page: number;
@@ -15,6 +15,7 @@ export const fetchRepoSearch = async (
   searchParams.set("q", params.q);
   searchParams.set("page", String(params.page));
   searchParams.set("per_page", String(params.per_page));
+  // TODO: need a sort
 
   // construct the API url
   const base = "https://api.github.com/search/repositories";
