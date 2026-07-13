@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { MemoryRouter } from "react-router";
+import { MemoryRouter, useLocation } from "react-router";
 import { render, screen } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { describe, it, expect } from "vitest";
@@ -8,18 +8,31 @@ import { http, HttpResponse } from "msw";
 import { server } from "../mocks/node";
 import SearchPage from "./SearchPage";
 
-const renderPage = () => {
+const LocationDisplay = () => {
+  const { search } = useLocation();
+  return <div data-testid="location">{search}</div>;
+};
+
+// `initialEntry` lets a test start the app already at a given URL — e.g. "on page 3"
+// — instead of clicking through pagination to get there.
+const renderPage = (initialEntry = "/") => {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
 
   const wrapper = ({ children }: { children: ReactNode }) => (
-    <MemoryRouter initialEntries={["/"]}>
+    <MemoryRouter initialEntries={[initialEntry]}>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </MemoryRouter>
   );
 
-  render(<SearchPage />, { wrapper });
+  render(
+    <>
+      <SearchPage />
+      <LocationDisplay />
+    </>,
+    { wrapper },
+  );
 };
 
 describe("SearchPage", () => {
@@ -157,5 +170,102 @@ describe("SearchPage", () => {
 
     const item2 = await screen.findByText("facebook/react/11");
     expect(item2).toBeInTheDocument();
+  });
+
+  it("resets page to 1 (and refetches) when the sort is changed while on page 3", async () => {
+    // The handler reflects the requested page + sort into the result name, so the
+    // rendered item proves which page/sort the app actually fetched.
+    server.use(
+      http.get("https://api.github.com/search/repositories", ({ request }) => {
+        const url = new URL(request.url);
+        const page = url.searchParams.get("page") ?? "1";
+        const sort = url.searchParams.get("sort") ?? "best-match";
+        return HttpResponse.json({
+          total_count: 30, // 3 pages at 10/page — page 3 is a valid starting point
+          incomplete_results: false,
+          items: [
+            {
+              id: 1,
+              full_name: `result-page-${page}-sort-${sort}`,
+              description: "lorem ipsum",
+            },
+          ],
+        });
+      }),
+    );
+
+    const user = userEvent.setup();
+    renderPage("/?q=react&page=3");
+
+    // start on page 3 (no sort param → best-match, so no `sort` is sent)
+    expect(
+      await screen.findByText("result-page-3-sort-best-match"),
+    ).toBeInTheDocument();
+
+    // user changes the sort dropdown
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: /sort/i }),
+      "stars",
+    );
+
+    // the URL reset page to 1 and applied the new sort
+    const location = screen.getByTestId("location");
+    expect(location.textContent).toContain("sort=stars");
+    expect(location.textContent).toContain("page=1");
+
+    // and the app refetched page 1 with the new sort (not still page 3)
+    expect(
+      await screen.findByText("result-page-1-sort-stars"),
+    ).toBeInTheDocument();
+  });
+
+  it("resets page to 1 (and refetches) when the page size is changed while on page 3", async () => {
+    // The handler reflects the requested page + per_page into the result name.
+    server.use(
+      http.get("https://api.github.com/search/repositories", ({ request }) => {
+        const url = new URL(request.url);
+        const page = url.searchParams.get("page") ?? "1";
+        const perPage = url.searchParams.get("per_page") ?? "10";
+        return HttpResponse.json({
+          total_count: 30,
+          incomplete_results: false,
+          items: [
+            {
+              id: 1,
+              full_name: `result-page-${page}-perpage-${perPage}`,
+              description: "lorem ipsum",
+            },
+          ],
+        });
+      }),
+    );
+
+    const user = userEvent.setup();
+    renderPage("/?q=react&page=3");
+
+    // start on page 3 at the default page size (10)
+    expect(
+      await screen.findByText("result-page-3-perpage-10"),
+    ).toBeInTheDocument();
+
+    // user changes the page-size dropdown
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: /per.?page/i }),
+      "50",
+    );
+
+    // The URL reset page to 1 and applied the new page size. Parse the query string
+    // (rather than substring-match) so "page=1" can't accidentally match inside
+    // "per_page=10" — a trap `toContain("page=1")` would fall into here.
+    const params = new URLSearchParams(
+      screen.getByTestId("location").textContent ?? "",
+    );
+    expect(params.get("page")).toBe("1");
+    expect(params.get("per_page")).toBe("50");
+
+    // and the app refetched page 1 at the new page size
+    expect(
+      await screen.findByText("result-page-1-perpage-50"),
+    ).toBeInTheDocument();
   });
 });

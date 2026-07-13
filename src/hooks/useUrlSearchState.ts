@@ -1,6 +1,9 @@
 import { useSearchParams } from "react-router";
+import type { SortOption } from "../types/github";
 
-export type SortOption = "best-match" | "stars" | "forks" | "updated";
+// validation at boundary
+const parseSort = (raw: string | null): SortOption =>
+  raw === "stars" || raw === "updated" ? raw : "best-match";
 
 export const useUrlSearchState = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -9,7 +12,7 @@ export const useUrlSearchState = () => {
   const q = searchParams.get("q") ?? "";
   const page = Number(searchParams.get("page")) || 1;
   const per_page = Number(searchParams.get("per_page")) || 10;
-  const sort = (searchParams.get("sort") as SortOption) ?? "best-match";
+  const sort = parseSort(searchParams.get("sort"));
 
   // update param
   const updateParams = (updates: Record<string, string>) => {
@@ -24,8 +27,9 @@ export const useUrlSearchState = () => {
 
   const setQuery = (v: string) => updateParams({ q: v });
   const setPage = (v: number) => updateParams({ page: String(v) });
-  const setPerPage = (v: number) => updateParams({ per_page: String(v) });
-  const setSort = (v: SortOption) => updateParams({ sort: v });
+  const setPerPage = (v: number) =>
+    updateParams({ per_page: String(v), page: "1" });
+  const setSort = (v: SortOption) => updateParams({ sort: v, page: "1" });
   const setQueryAndResetPage = (v: string) => updateParams({ q: v, page: "1" });
 
   return {

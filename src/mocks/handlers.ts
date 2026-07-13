@@ -1,5 +1,5 @@
 import { http, HttpResponse } from "msw";
-import type { SearchResponse } from "../types/github";
+import type { Repo, SearchResponse } from "../types/github";
 
 const allItems = [
   {
@@ -875,15 +875,34 @@ const allItems = [
   },
 ];
 
+// Returns a sorted COPY of the items (never mutates the caller's array — `.sort()`
+// sorts in place, which would permanently reorder the module-level fixture).
+// Unrecognized/absent sort values fall through to fixture order (the allowlist).
+const sortItems = (items: Repo[], sort: string | null): Repo[] => {
+  switch (sort) {
+    case "stars":
+      return [...items].sort((a, b) => b.stargazers_count - a.stargazers_count);
+    case "updated":
+      return [...items].sort(
+        (a, b) =>
+          new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime(),
+      );
+    default:
+      return items;
+  }
+};
+
 export const handlers = [
   http.get("https://api.github.com/search/repositories", ({ request }) => {
     const url = new URL(request.url);
     const page = Number(url.searchParams.get("page")) || 1;
     const perPage = Number(url.searchParams.get("per_page")) || 10;
+    const sort = url.searchParams.get("sort"); // string | null — honest, unvalidated
 
+    const sorted = sortItems(allItems, sort);
     const start = (page - 1) * perPage;
     const end = page * perPage;
-    const resultItems = allItems.slice(start, end);
+    const resultItems = sorted.slice(start, end);
 
     return HttpResponse.json<SearchResponse>({
       total_count: allItems.length,

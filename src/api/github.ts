@@ -1,11 +1,22 @@
-import { ApiError, type SearchResponse } from "../types/github";
+import { ApiError, type SearchResponse, type SortOption } from "../types/github";
 
-interface FetchRepoSearchParams {
+export interface FetchRepoSearchParams {
   q: string;
   page: number;
   per_page: number;
-  sort: "best-match" | "stars" | "forks" | "updated";
+  sort: SortOption;
 }
+
+// The sort values GitHub accepts as a `sort` query param that we also surface in
+// the UI. "best-match" is the neutral default (expressed by omitting the param),
+// so it is deliberately excluded. This is an allowlist: any value not listed here
+// (including a corrupted URL like ?sort=banana) falls through and sends no sort.
+// NB: "forks" is intentionally omitted — RepoCard doesn't show fork counts, so
+// sorting by a dimension the user can't see would be confusing.
+const SORTABLE_VALUES: readonly FetchRepoSearchParams["sort"][] = [
+  "stars",
+  "updated",
+];
 
 export const fetchRepoSearch = async (
   params: FetchRepoSearchParams,
@@ -15,6 +26,9 @@ export const fetchRepoSearch = async (
   searchParams.set("q", params.q);
   searchParams.set("page", String(params.page));
   searchParams.set("per_page", String(params.per_page));
+  if (SORTABLE_VALUES.includes(params.sort)) {
+    searchParams.set("sort", params.sort);
+  }
 
   // construct the API url
   const base = "https://api.github.com/search/repositories";

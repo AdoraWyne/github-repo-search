@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchRepoSearch } from "../api/github";
+import type { SortOption } from "../types/github";
 
 interface UseRepoSearchParams {
   q: string;
   page: number;
   per_page: number;
-  sort: "best-match" | "stars" | "forks" | "updated";
+  sort: SortOption;
 }
 
 export const useRepoSearch = ({
