@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { MemoryRouter } from "react-router";
+import { MemoryRouter, useLocation } from "react-router";
 import { render, screen } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { describe, it, expect } from "vitest";
@@ -8,18 +8,31 @@ import { http, HttpResponse } from "msw";
 import { server } from "../mocks/node";
 import SearchPage from "./SearchPage";
 
-const renderPage = () => {
+const LocationDisplay = () => {
+  const { search } = useLocation();
+  return <div data-testid="location">{search}</div>;
+};
+
+// `initialEntry` lets a test start the app already at a given URL — e.g. "on page 3"
+// — instead of clicking through pagination to get there.
+const renderPage = (initialEntry = "/") => {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
 
   const wrapper = ({ children }: { children: ReactNode }) => (
-    <MemoryRouter initialEntries={["/"]}>
+    <MemoryRouter initialEntries={[initialEntry]}>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </MemoryRouter>
   );
 
-  render(<SearchPage />, { wrapper });
+  render(
+    <>
+      <SearchPage />
+      <LocationDisplay />
+    </>,
+    { wrapper },
+  );
 };
 
 describe("SearchPage", () => {
