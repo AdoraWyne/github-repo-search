@@ -12,8 +12,10 @@ const SearchPage = () => {
       </h1>
 
       <SearchInput />
-      <PageSizeSelect />
-      <SortSelect />
+      <div className="my-4 flex flex-wrap items-end gap-4">
+        <SortSelect />
+        <PageSizeSelect />
+      </div>
       <ResultList />
     </PageLayout>
   );
