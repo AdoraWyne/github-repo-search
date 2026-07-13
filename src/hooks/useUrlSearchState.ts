@@ -2,6 +2,10 @@ import { useSearchParams } from "react-router";
 
 export type SortOption = "best-match" | "stars" | "updated";
 
+// validation at boundary
+const parseSort = (raw: string | null): SortOption =>
+  raw === "stars" || raw === "updated" ? raw : "best-match";
+
 export const useUrlSearchState = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -9,7 +13,7 @@ export const useUrlSearchState = () => {
   const q = searchParams.get("q") ?? "";
   const page = Number(searchParams.get("page")) || 1;
   const per_page = Number(searchParams.get("per_page")) || 10;
-  const sort = (searchParams.get("sort") as SortOption) ?? "best-match";
+  const sort = parseSort(searchParams.get("sort"));
 
   // update param
   const updateParams = (updates: Record<string, string>) => {

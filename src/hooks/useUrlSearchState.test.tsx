@@ -34,6 +34,15 @@ describe("useUrlSearchState", () => {
     expect(result.current.per_page).toBe(20);
     expect(result.current.sort).toBe("stars");
   });
+
+  // Boundary protection: the URL is untrusted (a user can hand-edit ?sort=banana).
+  // An unrecognized sort must collapse to best-match, not leak through as-is —
+  // otherwise a controlled <select value={sort}> renders blank.
+  it("falls back to best-match when the URL sort is invalid", () => {
+    const { result } = renderUrlState("/?sort=banana");
+
+    expect(result.current.sort).toBe("best-match");
+  });
 });
 
 describe("setters", () => {
