@@ -10,11 +10,15 @@ const wrapperWithUrl = (url: string) => {
   );
 };
 
+// Render the hook at a given URL. Hides the renderHook/wrapper plumbing so each
+// test shows only what matters: the starting URL and the assertions. Returns the
+// full renderHook result (result, rerender, unmount) — tests destructure what they need.
+const renderUrlState = (url = "/") =>
+  renderHook(() => useUrlSearchState(), { wrapper: wrapperWithUrl(url) });
+
 describe("useUrlSearchState", () => {
   it("returns defaults when no params are present", () => {
-    const { result } = renderHook(() => useUrlSearchState(), {
-      wrapper: wrapperWithUrl("/"),
-    });
+    const { result } = renderUrlState();
 
     expect(result.current.q).toBe("");
     expect(result.current.page).toBe(1);
@@ -23,9 +27,7 @@ describe("useUrlSearchState", () => {
   });
 
   it("reads the existing params correctly", () => {
-    const { result } = renderHook(() => useUrlSearchState(), {
-      wrapper: wrapperWithUrl("/?q=react&page=2&per_page=20&sort=stars"),
-    });
+    const { result } = renderUrlState("/?q=react&page=2&per_page=20&sort=stars");
 
     expect(result.current.q).toBe("react");
     expect(result.current.page).toBe(2);
@@ -36,9 +38,7 @@ describe("useUrlSearchState", () => {
 
 describe("setters", () => {
   it("setQuery updates q in the URL", () => {
-    const { result } = renderHook(() => useUrlSearchState(), {
-      wrapper: wrapperWithUrl("/"),
-    });
+    const { result } = renderUrlState();
 
     act(() => {
       result.current.setQuery("react");
@@ -48,9 +48,7 @@ describe("setters", () => {
   });
 
   it("setPage coerces number to string and updates the URL", () => {
-    const { result } = renderHook(() => useUrlSearchState(), {
-      wrapper: wrapperWithUrl("/"),
-    });
+    const { result } = renderUrlState();
 
     act(() => {
       result.current.setPage(3);
@@ -60,9 +58,7 @@ describe("setters", () => {
   });
 
   it("setQuery preserves other params (merge, not replace)", () => {
-    const { result } = renderHook(() => useUrlSearchState(), {
-      wrapper: wrapperWithUrl("/?q=old&sort=stars&per_page=20"),
-    });
+    const { result } = renderUrlState("/?q=old&sort=stars&per_page=20");
 
     act(() => {
       result.current.setQuery("new");
@@ -76,9 +72,7 @@ describe("setters", () => {
 
 describe("setQueryAndResetPage", () => {
   it("updates q and resets page to 1", () => {
-    const { result } = renderHook(() => useUrlSearchState(), {
-      wrapper: wrapperWithUrl("/?q=old&page=5"),
-    });
+    const { result } = renderUrlState("/?q=old&page=5");
 
     act(() => {
       result.current.setQueryAndResetPage("new");
@@ -89,9 +83,7 @@ describe("setQueryAndResetPage", () => {
   });
 
   it("preserves unrelated params (sort, per_page)", () => {
-    const { result } = renderHook(() => useUrlSearchState(), {
-      wrapper: wrapperWithUrl("/?q=old&page=5&sort=stars&per_page=20"),
-    });
+    const { result } = renderUrlState("/?q=old&page=5&sort=stars&per_page=20");
 
     act(() => {
       result.current.setQueryAndResetPage("new");
@@ -110,9 +102,7 @@ describe("setQueryAndResetPage", () => {
 
 describe("setSort", () => {
   it("updates sort, resets page to 1, and preserves q and per_page", () => {
-    const { result } = renderHook(() => useUrlSearchState(), {
-      wrapper: wrapperWithUrl("/?q=react&page=5&per_page=20&sort=best-match"),
-    });
+    const { result } = renderUrlState("/?q=react&page=5&per_page=20&sort=best-match");
 
     act(() => {
       result.current.setSort("stars");
@@ -144,9 +134,7 @@ describe("setPerPage", () => {
 
 describe("setPage (navigation, not a filter change)", () => {
   it("updates page and preserves q, per_page, and sort (no reset)", () => {
-    const { result } = renderHook(() => useUrlSearchState(), {
-      wrapper: wrapperWithUrl("/?q=react&page=2&per_page=20&sort=stars"),
-    });
+    const { result } = renderUrlState("/?q=react&page=2&per_page=20&sort=stars");
 
     act(() => {
       result.current.setPage(4);
