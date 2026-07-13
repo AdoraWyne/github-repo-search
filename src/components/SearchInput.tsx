@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { useUrlSearchState } from "../hooks/useUrlSearchState";
-import PageSizeSelect from "./PageSizeSelect";
 
 const SearchInput = () => {
-  const { per_page, q, setPerPage, setQueryAndResetPage } = useUrlSearchState();
+  const { q, setQueryAndResetPage } = useUrlSearchState();
   const [value, setValue] = useState<string>(q);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -30,7 +29,6 @@ const SearchInput = () => {
         type="text"
         value={value}
       />
-      <PageSizeSelect />
       <button
         className="border border-gray-300 rounded-sm p-2"
         disabled={!value.trim()}
