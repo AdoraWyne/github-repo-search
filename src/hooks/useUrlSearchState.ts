@@ -1,6 +1,5 @@
 import { useSearchParams } from "react-router";
-
-export type SortOption = "best-match" | "stars" | "updated";
+import type { SortOption } from "../types/github";
 
 // validation at boundary
 const parseSort = (raw: string | null): SortOption =>

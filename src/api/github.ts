@@ -1,10 +1,10 @@
-import { ApiError, type SearchResponse } from "../types/github";
+import { ApiError, type SearchResponse, type SortOption } from "../types/github";
 
 export interface FetchRepoSearchParams {
   q: string;
   page: number;
   per_page: number;
-  sort: "best-match" | "stars" | "updated";
+  sort: SortOption;
 }
 
 // The sort values GitHub accepts as a `sort` query param that we also surface in

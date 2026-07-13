@@ -1,4 +1,5 @@
-import { useUrlSearchState, type SortOption } from "../hooks/useUrlSearchState";
+import { useUrlSearchState } from "../hooks/useUrlSearchState";
+import type { SortOption } from "../types/github";
 
 const SortSelect = () => {
   const { sort, setSort } = useUrlSearchState();

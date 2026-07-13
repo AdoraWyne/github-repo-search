@@ -1,3 +1,7 @@
+// The sort options the UI surfaces and the GitHub API accepts. "best-match" is the
+// neutral default (sent as no `sort` param).
+export type SortOption = "best-match" | "stars" | "updated";
+
 export interface Owner {
   avatar_url: string;
 }
