@@ -18,25 +18,29 @@ const SearchInput = () => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <label htmlFor="search-query" className="sr-only">
-        Search repositories
-      </label>
-      <input
-        className="border border-gray-300 rounded-sm p-2 w-full bg-pink-50 my-4"
-        id="search-query"
-        name="search-query"
-        onChange={handleChange}
-        type="text"
-        value={value}
-      />
-      <button
-        className="border border-gray-300 rounded-sm p-2"
-        disabled={!value.trim()}
-        type="submit"
-      >
-        {" "}
-        Submit
-      </button>
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <div className="sm:flex-1">
+          <label htmlFor="search-query" className="sr-only">
+            Search repositories
+          </label>
+          <input
+            className="border border-gray-300 rounded-sm p-2 w-full bg-pink-50"
+            id="search-query"
+            name="search-query"
+            onChange={handleChange}
+            type="text"
+            value={value}
+          />
+        </div>
+        <button
+          className="border border-gray-300 rounded-sm p-2"
+          disabled={!value.trim()}
+          type="submit"
+        >
+          {" "}
+          Submit
+        </button>
+      </div>
     </form>
   );
 };
