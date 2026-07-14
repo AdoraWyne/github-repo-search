@@ -1,4 +1,8 @@
-import { ApiError, type SearchResponse, type SortOption } from "../types/github";
+import {
+  ApiError,
+  type SearchResponse,
+  type SortOption,
+} from "../types/github";
 
 export interface FetchRepoSearchParams {
   q: string;
