@@ -24,7 +24,7 @@ const SearchInput = () => {
             Search repositories
           </label>
           <input
-            className="border border-gray-300 rounded-sm p-2 w-full bg-pink-50"
+            className="border border-gray-300 rounded-sm p-2 w-full bg-pink-50 outline-none focus:ring-2 focus:ring-pink-300"
             id="search-query"
             name="search-query"
             onChange={handleChange}
