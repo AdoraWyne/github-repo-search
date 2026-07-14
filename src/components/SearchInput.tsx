@@ -33,7 +33,7 @@ const SearchInput = () => {
           />
         </div>
         <button
-          className="border border-gray-300 rounded-sm p-2"
+          className="border border-gray-300 rounded-sm p-2 hover:bg-pink-50 hover:cursor-pointer"
           disabled={!value.trim()}
           type="submit"
         >
