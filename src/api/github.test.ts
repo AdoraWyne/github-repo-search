@@ -114,4 +114,19 @@ describe("fetchRepoSearch", () => {
       expect(url.searchParams.has("sort")).toBe(false);
     });
   });
+
+  describe("per_page param forwarding", () => {
+    it("reflects per_page in the request URL", async () => {
+      const base: FetchRepoSearchParams = {
+        q: "react",
+        page: 1,
+        per_page: 10,
+        sort: "best-match",
+      };
+
+      const url = await captureRequestUrl({ ...base, per_page: 25 });
+
+      expect(url.searchParams.get("per_page")).toBe("25");
+    });
+  });
 });
