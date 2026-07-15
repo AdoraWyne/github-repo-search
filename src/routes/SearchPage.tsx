@@ -7,7 +7,7 @@ import SortSelect from "../components/SortSelect";
 const SearchPage = () => {
   return (
     <PageLayout>
-      <h1 className="text-4xl font-semibold">
+      <h1 className="text-4xl font-semibold my-4">
         Github Repository Search by adora 🐖
       </h1>
 
