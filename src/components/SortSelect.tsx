@@ -10,6 +10,7 @@ const SortSelect = () => {
         Sort by
       </label>
       <select
+        name="sort"
         id="sort"
         value={sort}
         onChange={(e) => setSort(e.target.value as SortOption)}
