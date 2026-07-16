@@ -4,7 +4,7 @@ import { render, screen } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { describe, it, expect } from "vitest";
 import userEvent from "@testing-library/user-event";
-import { http, HttpResponse } from "msw";
+import { http, HttpResponse, delay } from "msw";
 import { server } from "../mocks/node";
 import SearchPage from "./SearchPage";
 
@@ -77,6 +77,63 @@ describe("SearchPage", () => {
     expect(
       screen.getByText(/the library for web and native user interfaces/i),
     ).toBeInTheDocument();
+  });
+
+  it("shows an error state and recovers when Retry is clicked", async () => {
+    // A counter-backed handler: the first fetch fails, the retry succeeds. One flow
+    // exercises both the `!data` error branch (fetchRepoSearch throws on !res.ok, so
+    // data stays undefined) and the refetch() the Retry button triggers.
+    // The harness sets `retry: false`, so the error surfaces immediately — no backoff.
+    let calls = 0;
+    server.use(
+      http.get("https://api.github.com/search/repositories", () => {
+        calls += 1;
+        if (calls === 1) {
+          return new HttpResponse(null, { status: 500 });
+        }
+        return HttpResponse.json({
+          total_count: 1,
+          incomplete_results: false,
+          items: [
+            {
+              id: 1,
+              full_name: "facebook/react",
+              description: "The library for web and native user interfaces.",
+            },
+          ],
+        });
+      }),
+    );
+
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.type(screen.getByRole("textbox"), "react");
+    await user.click(screen.getByRole("button", { name: /submit/i }));
+
+    // First fetch failed → the error region (role="alert") with the message + Retry.
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      /something went wrong/i,
+    );
+
+    // Clicking Retry re-runs the query; the second response succeeds.
+    await user.click(screen.getByRole("button", { name: /retry/i }));
+
+    expect(await screen.findByText("facebook/react")).toBeInTheDocument();
+  });
+
+  it("shows the empty state (naming the query) when the search returns no results", async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.type(screen.getByRole("textbox"), "trigger:empty");
+    await user.click(screen.getByRole("button", { name: /submit/i }));
+
+    expect(
+      await screen.findByText(/no repositories matched/i),
+    ).toBeInTheDocument();
+
+    expect(screen.getByText(/trigger:empty/)).toBeInTheDocument();
   });
 
   it("fetches and displays page 2 results when clicking the Page 2 button", async () => {
@@ -170,6 +227,62 @@ describe("SearchPage", () => {
 
     const item2 = await screen.findByText("facebook/react/11");
     expect(item2).toBeInTheDocument();
+  });
+
+  it("keeps the previous page visible with no skeleton while page 2 loads", async () => {
+    // delay(100) on the page-2 branch opens a deterministic in-between window:
+    // after the click, page 2 is in flight while keepPreviousData holds page 1.
+    server.use(
+      http.get(
+        "https://api.github.com/search/repositories",
+        async ({ request }) => {
+          const page = new URL(request.url).searchParams.get("page");
+          if (page === "2") {
+            await delay(100);
+            return HttpResponse.json({
+              total_count: 11,
+              incomplete_results: false,
+              items: [
+                {
+                  id: 11,
+                  full_name: "facebook/react/11",
+                  description: "lorem ipsum 11.",
+                },
+              ],
+            });
+          }
+
+          return HttpResponse.json({
+            total_count: 11,
+            incomplete_results: false,
+            items: Array.from({ length: 10 }, (_, i) => ({
+              id: i + 1,
+              full_name: `facebook/react/${i + 1}`,
+              description: `lorem ipsum ${i + 1}.`,
+            })),
+          });
+        },
+      ),
+    );
+
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.type(screen.getByRole("textbox"), "react");
+    await user.click(screen.getByRole("button", { name: /submit/i }));
+
+    expect(await screen.findByText("facebook/react/1")).toBeInTheDocument();
+
+    // Navigate to page 2 — the response is delayed, so we're now mid-transition.
+    await user.click(await screen.findByRole("button", { name: "Page 2" }));
+
+    // Previous page stays on screen ...
+    expect(screen.getByText("facebook/react/1")).toBeInTheDocument();
+    // ... and crucially there is NO skeleton region during pagination.
+    expect(screen.queryByRole("status")).toBeNull();
+
+    // Once the delayed page-2 response resolves, the transition completes.
+    expect(await screen.findByText("facebook/react/11")).toBeInTheDocument();
   });
 
   it("resets page to 1 (and refetches) when the sort is changed while on page 3", async () => {
