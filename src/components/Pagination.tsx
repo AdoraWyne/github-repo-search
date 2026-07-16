@@ -33,7 +33,11 @@ const Pagination = ({
       {pages.map((page, i) => {
         if (page === "...")
           return (
-            <span key={`ellipsis-${i}`} aria-hidden="true">
+            <span
+              key={`ellipsis-${i}`}
+              aria-hidden="true"
+              className="text-gray-400 cursor-not-allowed"
+            >
               {page}
             </span>
           );

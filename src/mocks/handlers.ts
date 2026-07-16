@@ -1,6 +1,8 @@
 import { http, HttpResponse } from "msw";
 import type { Repo, SearchResponse } from "../types/github";
 
+// Read docs here: docs/msw-handler-behaviour.md
+
 const allItems = [
   {
     id: 10270250,
@@ -895,9 +897,18 @@ const sortItems = (items: Repo[], sort: string | null): Repo[] => {
 export const handlers = [
   http.get("https://api.github.com/search/repositories", ({ request }) => {
     const url = new URL(request.url);
+    const q = url.searchParams.get("q");
     const page = Number(url.searchParams.get("page")) || 1;
     const perPage = Number(url.searchParams.get("per_page")) || 10;
     const sort = url.searchParams.get("sort"); // string | null — honest, unvalidated
+
+    if (q === "trigger:empty") {
+      return HttpResponse.json<SearchResponse>({
+        total_count: 0,
+        incomplete_results: false,
+        items: [],
+      });
+    }
 
     const sorted = sortItems(allItems, sort);
     const start = (page - 1) * perPage;
