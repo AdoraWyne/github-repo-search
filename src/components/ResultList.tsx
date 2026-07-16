@@ -1,28 +1,45 @@
 import { useState } from "react";
 import { useRepoSearch } from "../hooks/useRepoSearch";
 import { useUrlSearchState } from "../hooks/useUrlSearchState";
-import { RepoCard } from "./RepoCard";
 import { formatCompactNumber } from "../utils/formatCompactNumber";
 import { relativeTime } from "../utils/relativeTime";
 import Pagination from "./Pagination";
+import { SkeletonCard } from "./SkeletonCard";
+import { RepoCard } from "./RepoCard";
+import { EmptyState } from "./EmptyState";
 
 const GITHUB_RESULT_CAP = 1_000;
+const SKELETON_COUNT = 6;
 
 const ResultList: React.FC = () => {
   const [dateNow] = useState(() => Date.now());
   const { q, page, per_page, sort, setPage } = useUrlSearchState();
-  const { data } = useRepoSearch({ q, page, per_page, sort });
+  const { data, isLoading } = useRepoSearch({ q, page, per_page, sort });
 
   if (!q.trim()) {
     return <p>What do you want to search?</p>;
   }
 
-  if (!data) {
-    return <p>Loading…</p>;
+  if (isLoading && !data) {
+    return (
+      <div role="status">
+        <span className="sr-only">Loading repositories…</span>
+        <ul>
+          {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
+            <li key={i} className="my-4">
+              <SkeletonCard />
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
   }
 
-  if (data && data.items.length === 0) {
-    return <p>No repositories found for "{q}"</p>;
+  // When first request is return with an error, so no data (isLoading is false)
+  if (!data) return null;
+
+  if (data?.items.length === 0) {
+    return <EmptyState query={q} />;
   }
 
   const maxPage = Math.min(
