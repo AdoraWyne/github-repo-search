@@ -14,7 +14,12 @@ const SKELETON_COUNT = 6;
 const ResultList: React.FC = () => {
   const [dateNow] = useState(() => Date.now());
   const { q, page, per_page, sort, setPage } = useUrlSearchState();
-  const { data, isLoading } = useRepoSearch({ q, page, per_page, sort });
+  const { data, isLoading, refetch } = useRepoSearch({
+    q,
+    page,
+    per_page,
+    sort,
+  });
 
   if (!q.trim()) {
     return <p>What do you want to search?</p>;
@@ -35,8 +40,24 @@ const ResultList: React.FC = () => {
     );
   }
 
-  // When first request is return with an error, so no data (isLoading is false)
-  if (!data) return null;
+  // No data while not loading = the fetch errored (see error-state discussion).
+  // role="alert" announces it to screen readers; Retry re-runs the query via refetch().
+  if (!data) {
+    return (
+      <div role="alert" className="mt-4 text-left text-gray-700">
+        <p>
+          Something went wrong.{" "}
+          <button
+            type="button"
+            onClick={() => refetch()}
+            className="mt-2 text-pink-500 underline"
+          >
+            Retry
+          </button>
+        </p>
+      </div>
+    );
+  }
 
   if (data?.items.length === 0) {
     return <EmptyState query={q} />;
