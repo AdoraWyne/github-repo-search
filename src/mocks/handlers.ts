@@ -1,6 +1,8 @@
 import { http, HttpResponse } from "msw";
 import type { Repo, SearchResponse } from "../types/github";
 
+// Read docs here: docs/msw-handler-behaviour.md
+
 const allItems = [
   {
     id: 10270250,
@@ -900,9 +902,6 @@ export const handlers = [
     const perPage = Number(url.searchParams.get("per_page")) || 10;
     const sort = url.searchParams.get("sort"); // string | null — honest, unvalidated
 
-    // Magic trigger: lets us reproduce the empty state in the browser during
-    // manual/dev verification (a server.use() override would only work in tests).
-    // Special-cased before sort/slice so it short-circuits the normal path.
     if (q === "trigger:empty") {
       return HttpResponse.json<SearchResponse>({
         total_count: 0,
