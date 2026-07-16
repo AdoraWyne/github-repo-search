@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useRepoSearch } from "../hooks/useRepoSearch";
 import { useUrlSearchState } from "../hooks/useUrlSearchState";
 import { RepoCard } from "./RepoCard";
+import { formatCompactNumber } from "../utils/formatCompactNumber";
 import { relativeTime } from "../utils/relativeTime";
 import Pagination from "./Pagination";
 
@@ -31,7 +32,7 @@ const ResultList: React.FC = () => {
 
   return (
     <>
-      <p>About {data.total_count} results.</p>
+      <p>About {formatCompactNumber(data.total_count)} results.</p>
       <ul>
         {data.items.map(
           ({
