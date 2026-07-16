@@ -40,7 +40,8 @@ const ResultList: React.FC = () => {
     );
   }
 
-  // No data while not loading = the fetch errored (see error-state discussion).
+  // No data while not loading = the fetch errored.
+  // See docs/react-query-loading-states.md for why this is the error catch-all.
   // role="alert" announces it to screen readers; Retry re-runs the query via refetch().
   if (!data) {
     return (
