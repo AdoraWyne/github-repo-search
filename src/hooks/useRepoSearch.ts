@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { fetchRepoSearch } from "../api/github";
 import type { SortOption } from "../types/github";
 
@@ -20,5 +20,6 @@ export const useRepoSearch = ({
     queryFn: () => fetchRepoSearch({ q, page, per_page, sort }),
     enabled: q.trim().length > 0,
     staleTime: 60_000,
+    placeholderData: keepPreviousData,
   });
 };
