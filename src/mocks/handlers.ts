@@ -910,6 +910,20 @@ export const handlers = [
       });
     }
 
+    // Transient server error. Only the `status: 503` matters — `fetchRepoSearch`
+    // maps status → error.type and never reads this body; the GitHub-shaped body
+    // is here for realism (and to mirror what the real API returns).
+    if (q === "trigger:503") {
+      return HttpResponse.json(
+        {
+          message: "Service Unavailable",
+          documentation_url:
+            "https://docs.github.com/rest/search/search#search-repositories",
+        },
+        { status: 503 },
+      );
+    }
+
     const sorted = sortItems(allItems, sort);
     const start = (page - 1) * perPage;
     const end = page * perPage;
