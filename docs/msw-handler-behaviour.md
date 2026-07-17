@@ -1,12 +1,18 @@
 # MSW handler — mock search behaviour
 
-**Status:** implemented (Issue #7). The mock lives in
-[`src/mocks/handlers.ts`](../src/mocks/handlers.ts) and backs both the browser dev server
+**Status:** implemented (Issue #7); extended with error triggers (Issue #8). The mock lives
+in [`src/mocks/handlers.ts`](../src/mocks/handlers.ts) and backs both the browser dev server
 (`browser.ts`) and the test server (`node.ts`).
 
 This handler intercepts `GET https://api.github.com/search/repositories` and returns
-canned data instead of hitting the real GitHub API. Two behaviours surprise people, so
+canned data instead of hitting the real GitHub API. A few behaviours surprise people, so
 they're documented here as an intentional contract, not a bug.
+
+**Magic `trigger:*` queries.** Certain exact `q` strings short-circuit the normal path to
+produce a specific response (an empty result set, an HTTP error, etc.). They exist so you can
+reproduce a state **anywhere the handler runs** — the browser dev server *and* tests — without
+a `server.use(...)` override. The error triggers (`trigger:503`, and more to come under Issue
+#8) are how we exercise the error-handling UI end-to-end.
 
 ## 1. The `trigger:empty` magic query → zero results
 
@@ -31,16 +37,43 @@ with `server.use(...)`, but that only works *inside a test*. The magic trigger w
 reproduce the empty state by hand without touching code. It's special-cased **before** the
 sort/slice logic so it short-circuits the normal path.
 
-## 2. The mock ignores `q` for everything else — you always get the "react" fixtures
+## 2. The `trigger:503` magic query → a 503 error response
+
+Searching for the exact string **`trigger:503`** returns an HTTP 503 (service unavailable):
+
+```ts
+if (q === "trigger:503") {
+  return HttpResponse.json(
+    { message: "Service Unavailable", documentation_url: "…" },
+    { status: 503 },
+  );
+}
+```
+
+**Use it when** you want to see the `service_down` error banner ("GitHub is temporarily
+unavailable.") — by hand in the browser, or as the input in an integration test (see
+`SearchPage.test.tsx`).
+
+**The surprise: only the `status` matters — the body is cosmetic.** `fetchRepoSearch` reads
+`res.status` (and maps it via `toErrorType(503) → "service_down"`) but **never reads the
+response body**. The GitHub-shaped `{ message, documentation_url }` is there purely for
+realism; you could return `null` as the body and the UI would behave identically. Don't add
+assertions that depend on this body — nothing in the app consumes it.
+
+**Why an error trigger at all?** Same reasoning as `trigger:empty`: it lets you reproduce a
+failure state without editing code or forcing it per-test. This is the first of the Issue #8
+error triggers; `invalid_query` (422) and `rate_limited` (403/429) will follow the same shape.
+
+## 3. The mock ignores `q` for everything else — you always get the "react" fixtures
 
 The fixture list (`allItems`) is a fixed set of ~70 React-ecosystem repos. **Apart from the
-`trigger:empty` special case, the handler does not filter by `q`.** So:
+`trigger:*` special cases, the handler does not filter by `q`.** So:
 
 - Search `vue` → you still get the React repos.
 - Search `anything at all` → same React repos.
 
-**This is expected. Don't be surprised.** The handler reads `q` only to check for the
-`trigger:empty` trigger; it never uses it to filter the fixtures.
+**This is expected. Don't be surprised.** The handler reads `q` only to match the `trigger:*`
+magic strings; it never uses it to filter the fixtures.
 
 **Why leave it un-filtered?**
 
@@ -58,10 +91,11 @@ The fixture list (`allItems`) is a fixed set of ~70 React-ecosystem repos. **Apa
 
 | URL param   | Honoured? | Behaviour                                                       |
 | ----------- | --------- | -------------------------------------------------------------- |
-| `q`         | partial   | Only checked for `trigger:empty`; otherwise ignored            |
+| `q`         | partial   | Only matched against `trigger:*` magic strings; otherwise ignored |
 | `page`      | yes       | Slices `allItems` into the requested page                      |
 | `per_page`  | yes       | Page size for the slice (defaults to 10)                       |
 | `sort`      | yes       | `stars` / `updated` re-order a copy; unknown values → fixture order |
 
-`total_count` always reports `allItems.length` (except the `trigger:empty` case), so
-pagination controls behave as if the full fixture set were the search result.
+`total_count` always reports `allItems.length` (except the `trigger:*` cases, which
+short-circuit before the fixtures), so pagination controls behave as if the full fixture set
+were the search result.
