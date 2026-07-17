@@ -122,6 +122,25 @@ describe("SearchPage", () => {
     expect(await screen.findByText("facebook/react")).toBeInTheDocument();
   });
 
+  it("shows the service-unavailable banner with Retry when the API returns 503", async () => {
+    // Uses the default `trigger:503` handler baked into handlers.ts (no server.use
+    // override) — the same pattern as trigger:empty. The 503 maps to
+    // error.type === "service_down", which ErrorBanner renders as its own message.
+    // renderPage's QueryClient sets `retry: false`, so the banner shows immediately
+    // instead of after retry backoff — that's what makes this assertion synchronous.
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.type(screen.getByRole("textbox"), "trigger:503");
+    await user.click(screen.getByRole("button", { name: /submit/i }));
+
+    // The service_down arm of ErrorBanner (its own copy, not the generic fallback).
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      /github is temporarily unavailable/i,
+    );
+    expect(screen.getByRole("button", { name: /retry/i })).toBeInTheDocument();
+  });
+
   it("shows the empty state (naming the query) when the search returns no results", async () => {
     const user = userEvent.setup();
     renderPage();
