@@ -15,7 +15,7 @@ export const ErrorBanner = ({ error, onRetry }: ErrorBannerProps) => {
       return (
         <div role="alert" className="mt-4 text-left text-gray-700">
           <p>
-            GitHub is temporarily unavailable.
+            GitHub is temporarily unavailable.{" "}
             <button
               type="button"
               onClick={onRetry}
