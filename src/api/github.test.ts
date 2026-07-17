@@ -1,11 +1,16 @@
 import { describe, it, expect } from "vitest";
 import { http, HttpResponse } from "msw";
 import { server } from "../mocks/node";
-import { fetchRepoSearch, type FetchRepoSearchParams } from "./github";
+import {
+  fetchRepoSearch,
+  toErrorType,
+  type FetchRepoSearchParams,
+} from "./github";
 import { ApiError } from "../types/github";
 
 // Spin up a one-off handler that captures the outgoing request URL, call
 // fetchRepoSearch, and hand back the parsed URL so tests can assert on params.
+// read journal/10_capturing_request_url_with_msw.md
 const captureRequestUrl = async (
   params: FetchRepoSearchParams,
 ): Promise<URL> => {
@@ -25,6 +30,17 @@ const captureRequestUrl = async (
   await fetchRepoSearch(params);
   return new URL(capturedUrl);
 };
+
+describe("toErrorType", () => {
+  it("maps 503 to service_down", () => {
+    expect(toErrorType(503)).toBe("service_down");
+  });
+
+  // The catch-all: anything we don't explicitly map falls through to unknown.
+  it("maps an unrecognised status (500) to unknown", () => {
+    expect(toErrorType(500)).toBe("unknown");
+  });
+});
 
 describe("fetchRepoSearch", () => {
   it("builds the correct URL with q param", async () => {
@@ -75,6 +91,41 @@ describe("fetchRepoSearch", () => {
         sort: "best-match",
       }),
     ).rejects.toMatchObject({ status: 422 });
+  });
+
+  it("throws an ApiError typed service_down on a 503 response", async () => {
+    server.use(
+      http.get("https://api.github.com/search/repositories", () => {
+        return new HttpResponse(null, { status: 503 });
+      }),
+    );
+
+    await expect(
+      fetchRepoSearch({
+        q: "test",
+        page: 1,
+        per_page: 10,
+        sort: "best-match",
+      }),
+      // read journal/09_rejects_and_toMatchObject.md to understand this syntax
+    ).rejects.toMatchObject({ status: 503, type: "service_down" });
+  });
+
+  it("throws an ApiError typed unknown on an unmapped 500 response", async () => {
+    server.use(
+      http.get("https://api.github.com/search/repositories", () => {
+        return new HttpResponse(null, { status: 500 });
+      }),
+    );
+
+    await expect(
+      fetchRepoSearch({
+        q: "test",
+        page: 1,
+        per_page: 10,
+        sort: "best-match",
+      }),
+    ).rejects.toMatchObject({ status: 500, type: "unknown" });
   });
 
   describe("sort param mapping", () => {
