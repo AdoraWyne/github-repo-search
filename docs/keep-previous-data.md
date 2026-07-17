@@ -2,8 +2,8 @@
 
 **Status:** implemented (Issue #7). Configured in
 [`useRepoSearch`](../src/hooks/useRepoSearch.ts) as `placeholderData: keepPreviousData`.
-For the underlying flag mechanics (`isLoading = isPending && isFetching`, the error state),
-see [react-query-loading-states.md](./react-query-loading-states.md). This doc is about the
+For the underlying flag mechanics (`isLoading = isPending && isFetching`, the error and
+offline states), see [react-query-loading-states.md](./react-query-loading-states.md). This doc is about the
 **UX decision**: what turning `keepPreviousData` on and off actually does to our app, and the
 trade-off we accepted.
 
@@ -58,14 +58,19 @@ For this issue, uniform behaviour matches the acceptance criteria, so we didn't
 over-engineer it. Flagging the seam here in case a reviewer asks, or in case a future
 "fresh skeleton on new query term" requirement makes it worth splitting the code path.
 
-## Related edge: what happens on error differs too
+## Related edge: what happens on error (and offline) differs too
 
 A subtle knock-on effect (full detail in
-[react-query-loading-states.md](./react-query-loading-states.md)):
+[react-query-loading-states.md](./react-query-loading-states.md)). The rule is simple: the
+`!data` branch only runs when `data` is undefined, and `keepPreviousData` gives later pages a
+placeholder — so `data` is defined and the branch is skipped.
 
-- **First-load failure** hits our `if (!data)` error branch **either way** — there's no
-  previous data for `keepPreviousData` to keep.
-- **A later page's failure** differs: *without* `keepPreviousData` → `data` is undefined →
-  error branch fires; *with* it → the previous page may still be shown (`data` defined) → the
-  error branch is skipped. So `keepPreviousData` also changes *which* failures surface as
-  errors, not just how loading looks.
+- **On the first load, there is no previous page to keep.** So `data` stays undefined and the
+  `!data` branch runs — showing the error banner if the fetch failed, or the "Waiting for a
+  connection…" message if the user is offline.
+- **On a later page, `keepPreviousData` keeps the previous page's results.** So `data` is
+  defined, the `!data` branch is skipped, and the user keeps seeing the old page instead of an
+  error banner or offline message.
+
+In short: `keepPreviousData` hides **both** the error banner and the offline message whenever
+a previous page exists — it changes *which* failures the user sees, not just how loading looks.
