@@ -1,7 +1,11 @@
 import type { ReactNode } from "react";
 import { MemoryRouter, useLocation } from "react-router";
 import { render, screen } from "@testing-library/react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  onlineManager,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
 import { describe, it, expect } from "vitest";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse, delay } from "msw";
@@ -139,6 +143,32 @@ describe("SearchPage", () => {
       /github is temporarily unavailable/i,
     );
     expect(screen.getByRole("button", { name: /retry/i })).toBeInTheDocument();
+  });
+
+  it("shows the waiting-for-connection message on a first load while offline", async () => {
+    // React Query's onlineManager is a global singleton that tracks whether RQ
+    // believes the app is online. Setting it offline makes the query PAUSE instead
+    // of firing: status stays `pending`, fetchStatus is `paused`, data is undefined,
+    // and error is null. That lands on ResultList's `!data` branch with no error,
+    // which renders the "Waiting for a connection…" message (not an error banner).
+    onlineManager.setOnline(false);
+
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.type(screen.getByRole("textbox"), "react");
+    await user.click(screen.getByRole("button", { name: /submit/i }));
+
+    // The no-error arm of the `!data` branch — the paused/offline message.
+    expect(
+      await screen.findByText(/waiting for a connection/i),
+    ).toBeInTheDocument();
+    // And crucially it is NOT the error banner.
+    expect(screen.queryByRole("alert")).toBeNull();
+
+    // NOTE: fragile inline reset — if an assertion above throws, this never runs and
+    // "offline" leaks into the next test. Step 3 replaces this with an afterEach.
+    onlineManager.setOnline(true);
   });
 
   it("shows the empty state (naming the query) when the search returns no results", async () => {
