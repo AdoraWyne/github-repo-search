@@ -23,24 +23,31 @@ export interface SearchResponse {
   items: Repo[];
 }
 
+// The semantic error categories the UI renders. The presentation layer branches
+// on this — never on the raw HTTP status — so GitHub's status codes stay out of
+// the components. `unknown` is the catch-all (network failures, unexpected 5xx).
+export type ApiErrorType =
+  | "rate_limited"
+  | "invalid_query"
+  | "service_down"
+  | "unknown";
+
 export class ApiError extends Error {
   status: number;
+  // Required: every ApiError carries a semantic category.
+  type: ApiErrorType;
   rateLimitReset?: number;
 
-  constructor(message: string, status: number, rateLimitReset?: number) {
+  constructor(
+    message: string,
+    status: number,
+    type: ApiErrorType,
+    rateLimitReset?: number,
+  ) {
     super(message);
     this.status = status;
+    this.type = type;
     this.rateLimitReset = rateLimitReset;
     this.name = "ApiError";
   }
 }
-
-// id: items[] -> item.id
-// full_name: items[] -> item.full_name
-// owner avatar: items[] -> item.owner?.avatar_url
-// owner login (linked to owner's GitHub page)
-// description: items[] -> item.description
-// html_url: item.html_url
-// stargazers_count: items[] -> item.stargazers_count
-// primary language: items[] -> item.language
-// updatedAt: items[] -> item.updated_at
