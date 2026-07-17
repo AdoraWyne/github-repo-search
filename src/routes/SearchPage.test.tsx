@@ -171,6 +171,58 @@ describe("SearchPage", () => {
     onlineManager.setOnline(true);
   });
 
+  it("keeps the previous page (no offline message) when a later page is fetched offline", async () => {
+    // Contrast with the test above: same paused/offline state, but here page 1 has
+    // already loaded. keepPreviousData holds page 1 as placeholder, so `data` stays
+    // defined and ResultList NEVER reaches the `!data` branch — no offline message,
+    // no error banner. The user just keeps seeing page 1.
+    server.use(
+      http.get("https://api.github.com/search/repositories", ({ request }) => {
+        const page = new URL(request.url).searchParams.get("page");
+        if (page === "2") {
+          return HttpResponse.json({
+            total_count: 11,
+            incomplete_results: false,
+            items: [
+              { id: 11, full_name: "facebook/react/11", description: "page 2" },
+            ],
+          });
+        }
+        return HttpResponse.json({
+          total_count: 11, // > per_page (10) so a Page 2 button renders
+          incomplete_results: false,
+          items: Array.from({ length: 10 }, (_, i) => ({
+            id: i + 1,
+            full_name: `facebook/react/${i + 1}`,
+            description: `lorem ipsum ${i + 1}.`,
+          })),
+        });
+      }),
+    );
+
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.type(screen.getByRole("textbox"), "react");
+    await user.click(screen.getByRole("button", { name: /submit/i }));
+
+    // Page 1 loads while online.
+    expect(await screen.findByText("facebook/react/1")).toBeInTheDocument();
+
+    // Go offline, THEN navigate to page 2 → the page-2 fetch pauses.
+    onlineManager.setOnline(false);
+    await user.click(await screen.findByRole("button", { name: "Page 2" }));
+
+    // Page 1 stays put (kept data), and the `!data` branch is skipped:
+    expect(screen.getByText("facebook/react/1")).toBeInTheDocument();
+    expect(screen.queryByText(/waiting for a connection/i)).toBeNull();
+    expect(screen.queryByRole("alert")).toBeNull();
+
+    // Fragile inline reset (see note in the offline test above) — step 3 moves this
+    // to an afterEach so a mid-test failure can't leak "offline" into other tests.
+    onlineManager.setOnline(true);
+  });
+
   it("shows the empty state (naming the query) when the search returns no results", async () => {
     const user = userEvent.setup();
     renderPage();
