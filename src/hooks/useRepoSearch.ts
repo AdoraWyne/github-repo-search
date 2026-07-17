@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { fetchRepoSearch } from "../api/github";
-import type { SortOption } from "../types/github";
+import type { ApiError, SearchResponse, SortOption } from "../types/github";
 
 interface UseRepoSearchParams {
   q: string;
@@ -15,7 +15,7 @@ export const useRepoSearch = ({
   per_page,
   sort,
 }: UseRepoSearchParams) => {
-  return useQuery({
+  return useQuery<SearchResponse, ApiError>({
     queryKey: ["repos", { q, page, per_page, sort }],
     queryFn: () => fetchRepoSearch({ q, page, per_page, sort }),
     enabled: q.trim().length > 0,
