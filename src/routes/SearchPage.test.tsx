@@ -165,10 +165,7 @@ describe("SearchPage", () => {
     ).toBeInTheDocument();
     // And crucially it is NOT the error banner.
     expect(screen.queryByRole("alert")).toBeNull();
-
-    // NOTE: fragile inline reset — if an assertion above throws, this never runs and
-    // "offline" leaks into the next test. Step 3 replaces this with an afterEach.
-    onlineManager.setOnline(true);
+    // Reset back to online is handled globally in src/test/setup.ts.
   });
 
   it("keeps the previous page (no offline message) when a later page is fetched offline", async () => {
@@ -217,10 +214,7 @@ describe("SearchPage", () => {
     expect(screen.getByText("facebook/react/1")).toBeInTheDocument();
     expect(screen.queryByText(/waiting for a connection/i)).toBeNull();
     expect(screen.queryByRole("alert")).toBeNull();
-
-    // Fragile inline reset (see note in the offline test above) — step 3 moves this
-    // to an afterEach so a mid-test failure can't leak "offline" into other tests.
-    onlineManager.setOnline(true);
+    // Reset back to online is handled globally in src/test/setup.ts.
   });
 
   it("shows the empty state (naming the query) when the search returns no results", async () => {
