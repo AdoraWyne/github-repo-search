@@ -41,14 +41,10 @@ const ResultList: React.FC = () => {
     );
   }
 
-  // No data while not loading means the query is "pending, but not fetching":
-  // either the fetch failed (error is set) or it's paused/offline (error is null).
-  // See docs/react-query-loading-states.md for the full state breakdown.
-  // We key off `!data` (not `isError`) on purpose: with keepPreviousData, a later
-  // page's failure keeps the previous results, so this only fires when there's
-  // genuinely nothing to show. ErrorBanner picks the message from error.type;
-  // the no-error branch is the paused/offline case, so we say so instead of
-  // rendering nothing (a blank screen gives the user no feedback).
+  // No data & not loading → the query is pending-but-not-fetching: failed (error set)
+  // or paused/offline (error null). We branch on `!data` not `isError` because
+  // keepPreviousData keeps earlier results, so this only fires with nothing to show.
+  // Full state breakdown: docs/react-query-loading-states.md
   if (!data) {
     return error ? (
       <ErrorBanner error={error} onRetry={() => refetch()} />
