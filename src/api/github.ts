@@ -30,6 +30,8 @@ export const toErrorType = (status: number): ApiErrorType => {
   switch (status) {
     case 503:
       return "service_down";
+    case 422:
+      return "invalid_query";
     default:
       return "unknown";
   }
