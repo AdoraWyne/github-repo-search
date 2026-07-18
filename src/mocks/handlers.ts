@@ -924,6 +924,28 @@ export const handlers = [
       );
     }
 
+    // Validation error. Like the 503 case, only `status: 422` drives the UI —
+    // `fetchRepoSearch` maps status → error.type and never reads this body. The
+    // GitHub-shaped "Validation Failed" body (with the `errors` array) mirrors
+    // what the real search API returns for a malformed/too-long query.
+    if (q === "trigger:422") {
+      return HttpResponse.json(
+        {
+          message: "Validation Failed",
+          errors: [
+            {
+              resource: "Search",
+              field: "q",
+              code: "invalid",
+            },
+          ],
+          documentation_url:
+            "https://docs.github.com/rest/search/search#search-repositories",
+        },
+        { status: 422 },
+      );
+    }
+
     const sorted = sortItems(allItems, sort);
     const start = (page - 1) * perPage;
     const end = page * perPage;
