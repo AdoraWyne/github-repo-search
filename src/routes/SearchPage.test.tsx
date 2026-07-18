@@ -145,6 +145,25 @@ describe("SearchPage", () => {
     expect(screen.getByRole("button", { name: /retry/i })).toBeInTheDocument();
   });
 
+  it("shows the invalid-query message (and no Retry) when the API returns 422", async () => {
+    // Uses the default `trigger:422` handler baked into handlers.ts. A 422 maps to
+    // error.type === "invalid_query". Unlike service_down, this arm renders NO Retry
+    // button: retrying the same rejected query would just 422 again — the user has to
+    // change the query. retry: false (from renderPage) makes the banner synchronous.
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.type(screen.getByRole("textbox"), "trigger:422");
+    await user.click(screen.getByRole("button", { name: /submit/i }));
+
+    // The invalid_query arm of ErrorBanner.
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      /that search couldn't be processed/i,
+    );
+    // The defining difference from the other error arms: no Retry offered.
+    expect(screen.queryByRole("button", { name: /retry/i })).toBeNull();
+  });
+
   it("shows the waiting-for-connection message on a first load while offline", async () => {
     // React Query's onlineManager is a global singleton that tracks whether RQ
     // believes the app is online. Setting it offline makes the query PAUSE instead
