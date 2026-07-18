@@ -26,6 +26,15 @@ export const ErrorBanner = ({ error, onRetry }: ErrorBannerProps) => {
           </p>
         </div>
       );
+    // No Retry button here: a 422 means the query itself is the problem, so
+    // re-running the identical request would just fail again. The action lives
+    // with the user — change the query — which the message spells out.
+    case "invalid_query":
+      return (
+        <div role="alert" className="mt-4 text-left text-gray-700">
+          <p>That search couldn&apos;t be processed. Try a shorter query.</p>
+        </div>
+      );
     default:
       return (
         <div role="alert" className="mt-4 text-left text-gray-700">
