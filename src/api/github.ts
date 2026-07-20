@@ -32,6 +32,9 @@ export const toErrorType = (status: number): ApiErrorType => {
       return "service_down";
     case 422:
       return "invalid_query";
+    case 403:
+    case 429:
+      return "rate_limited";
     default:
       return "unknown";
   }

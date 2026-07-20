@@ -40,6 +40,14 @@ describe("toErrorType", () => {
     expect(toErrorType(422)).toBe("invalid_query");
   });
 
+  it("maps 403 to rate_limited", () => {
+    expect(toErrorType(403)).toBe("rate_limited");
+  });
+
+  it("maps 429 to rate_limited", () => {
+    expect(toErrorType(429)).toBe("rate_limited");
+  });
+
   // The catch-all: anything we don't explicitly map falls through to unknown.
   it("maps an unrecognised status (500) to unknown", () => {
     expect(toErrorType(500)).toBe("unknown");
