@@ -36,18 +36,11 @@ export class ApiError extends Error {
   status: number;
   // Required: every ApiError carries a semantic category.
   type: ApiErrorType;
-  rateLimitReset?: number;
 
-  constructor(
-    message: string,
-    status: number,
-    type: ApiErrorType,
-    rateLimitReset?: number,
-  ) {
+  constructor(message: string, status: number, type: ApiErrorType) {
     super(message);
     this.status = status;
     this.type = type;
-    this.rateLimitReset = rateLimitReset;
     this.name = "ApiError";
   }
 }
