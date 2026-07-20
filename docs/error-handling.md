@@ -11,12 +11,18 @@ the table top to bottom.
 | 3 | `!data && error` | `ErrorBanner` (full screen) | ✅ built |
 | 4 | `!data && !error` | "Waiting for a connection…" | ✅ built |
 | 5 | `data.items.length === 0` | `EmptyState` | ✅ built |
-| 6 | `data && error` | keep list + inline error strip | 🚧 Slice D |
-| 7 | `data && !error` | the results list + pagination | ✅ built |
+| 6 | `data && !error` | the results list + pagination | ✅ built |
 
-Rule of thumb: states 2–4 all require **`!data`** on purpose. With
-`keepPreviousData`, once we have *any* results, `data` stays defined — so these
-"nothing to show" states only ever fire on a **first load**, never mid-pagination.
+Rule of thumb: states 2–4 require **`!data`**. `keepPreviousData` keeps `data`
+defined while a new page is *loading* (pending/paused) — that's why the skeleton
+and waiting states only fire on a **first load**, never during a *successful*
+pagination.
+
+**But an error is different.** `keepPreviousData` only bridges the loading phase;
+when a fetch **errors**, `data` falls to `undefined`. So *any* failure — first load
+**or** a later page — lands in state 3 and shows the **full banner**. There is no
+"`data && error`" state: on error there is no `data`. (See the "no inline strip"
+note below.)
 
 ---
 
@@ -69,18 +75,16 @@ is deliberately distinct from an *error*. (This is the second status axis:
 The fetch **succeeded** but returned zero items. `EmptyState` names the query so
 the user knows what came back empty.
 
-## 6. `data && error` → keep the list, show an inline strip 🚧 (Slice D — planned)
-
-If earlier results are cached and a *later* fetch fails (e.g. paginating to page 2),
-`data` is still defined, so none of the `!data` guards above fire.
-
-- **Current behaviour:** the error is **silent** — we keep showing the stale list
-  and give no sign the last fetch failed.
-- **Expected behaviour (Slice D):** keep the list visible **and** surface the error
-  in a **non-blocking inline strip** (not the full-screen banner, which would wipe
-  good data), carrying the same Retry. The strip presents any `error.type`.
-
-## 7. `data && !error` → the results list
+## 6. `data && !error` → the results list
 
 The happy path: render the repo cards, plus pagination when there's more than one
 page of results.
+
+## No inline error strip (Slice D — dropped)
+
+We considered keeping the list visible and surfacing a *later* failure (e.g. page 2)
+in a non-blocking inline strip. We dropped it: `keepPreviousData` doesn't retain
+`data` through an error, so a mid-pagination failure already collapses to state 3
+(the full banner replaces the list). Keeping the list would mean holding the
+last-good data ourselves (a ref) — not worth it for now. **Decision: any error shows
+the full banner.** Revisit if we later want the list to survive a failed page fetch.
