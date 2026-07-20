@@ -29,20 +29,24 @@ describe("Pagination", () => {
     expect(onPageChange).toHaveBeenCalledTimes(1);
   });
 
-  it("disables Previous button when on page 1", () => {
-    renderPagination();
+  it("marks Previous as aria-disabled and ignores clicks on page 1", async () => {
+    const { user, onPageChange } = renderPagination();
 
     const previousButton = screen.getByRole("button", { name: /previous/i });
 
-    expect(previousButton).toBeDisabled();
+    expect(previousButton).toHaveAttribute("aria-disabled", "true");
+    await user.click(previousButton);
+    expect(onPageChange).not.toHaveBeenCalled();
   });
 
-  it("disables Next button when on the last page", () => {
-    renderPagination({ currentPage: 10 });
+  it("marks Next as aria-disabled and ignores clicks on the last page", async () => {
+    const { user, onPageChange } = renderPagination({ currentPage: 10 });
 
     const nextButton = screen.getByRole("button", { name: /next/i });
 
-    expect(nextButton).toBeDisabled();
+    expect(nextButton).toHaveAttribute("aria-disabled", "true");
+    await user.click(nextButton);
+    expect(onPageChange).not.toHaveBeenCalled();
   });
 
   it("marks the active page with aria-current='page'", () => {
