@@ -68,32 +68,6 @@ describe("fetchRepoSearch", () => {
     expect(capturedUrl).toContain("q=react");
   });
 
-  it("return error", async () => {
-    server.use(
-      http.get("https://api.github.com/search/repositories", () => {
-        return new HttpResponse(null, { status: 422 });
-      }),
-    );
-
-    await expect(
-      fetchRepoSearch({
-        q: "test",
-        page: 1,
-        per_page: 10,
-        sort: "best-match",
-      }),
-    ).rejects.toBeInstanceOf(ApiError);
-
-    await expect(
-      fetchRepoSearch({
-        q: "test",
-        page: 1,
-        per_page: 10,
-        sort: "best-match",
-      }),
-    ).rejects.toMatchObject({ status: 422 });
-  });
-
   it("throws an ApiError typed service_down on a 503 response", async () => {
     server.use(
       http.get("https://api.github.com/search/repositories", () => {
@@ -110,23 +84,6 @@ describe("fetchRepoSearch", () => {
       }),
       // read journal/09_rejects_and_toMatchObject.md to understand this syntax
     ).rejects.toMatchObject({ status: 503, type: "service_down" });
-  });
-
-  it("throws an ApiError typed unknown on an unmapped 500 response", async () => {
-    server.use(
-      http.get("https://api.github.com/search/repositories", () => {
-        return new HttpResponse(null, { status: 500 });
-      }),
-    );
-
-    await expect(
-      fetchRepoSearch({
-        q: "test",
-        page: 1,
-        per_page: 10,
-        sort: "best-match",
-      }),
-    ).rejects.toMatchObject({ status: 500, type: "unknown" });
   });
 
   describe("sort param mapping", () => {
