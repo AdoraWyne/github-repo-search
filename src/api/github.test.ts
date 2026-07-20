@@ -32,25 +32,14 @@ const captureRequestUrl = async (
 };
 
 describe("toErrorType", () => {
-  it("maps 503 to service_down", () => {
-    expect(toErrorType(503)).toBe("service_down");
-  });
-
-  it("maps 422 to invalid_query", () => {
-    expect(toErrorType(422)).toBe("invalid_query");
-  });
-
-  it("maps 403 to rate_limited", () => {
-    expect(toErrorType(403)).toBe("rate_limited");
-  });
-
-  it("maps 429 to rate_limited", () => {
-    expect(toErrorType(429)).toBe("rate_limited");
-  });
-
-  // The catch-all: anything we don't explicitly map falls through to unknown.
-  it("maps an unrecognised status (500) to unknown", () => {
-    expect(toErrorType(500)).toBe("unknown");
+  it.each([
+    [503, "service_down"],
+    [422, "invalid_query"],
+    [403, "rate_limited"],
+    [429, "rate_limited"],
+    [500, "unknown"],
+  ] as const)("maps %i to %s", (status, expected) => {
+    expect(toErrorType(status)).toBe(expected);
   });
 });
 
