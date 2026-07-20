@@ -1,5 +1,6 @@
 import {
   ApiError,
+  type ApiErrorType,
   type SearchResponse,
   type SortOption,
 } from "../types/github";
@@ -21,6 +22,20 @@ const SORTABLE_VALUES: readonly FetchRepoSearchParams["sort"][] = [
   "stars",
   "updated",
 ];
+
+export const toErrorType = (status: number): ApiErrorType => {
+  switch (status) {
+    case 503:
+      return "service_down";
+    case 422:
+      return "invalid_query";
+    case 403:
+    case 429:
+      return "rate_limited";
+    default:
+      return "unknown";
+  }
+};
 
 export const fetchRepoSearch = async (
   params: FetchRepoSearchParams,
@@ -44,6 +59,7 @@ export const fetchRepoSearch = async (
     throw new ApiError(
       `Github API Error: ${res.status} ${res.statusText}`,
       res.status,
+      toErrorType(res.status),
     );
   }
   return res.json();

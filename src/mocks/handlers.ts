@@ -910,6 +910,61 @@ export const handlers = [
       });
     }
 
+    // Service Down (Service Unavailable). Transient server error.
+    if (q === "trigger:503") {
+      return HttpResponse.json(
+        {
+          message: "Service Unavailable",
+          documentation_url:
+            "https://docs.github.com/rest/search/search#search-repositories",
+        },
+        { status: 503 },
+      );
+    }
+
+    // Validation error (Unprocessable Content). no retry.
+    if (q === "trigger:422") {
+      return HttpResponse.json(
+        {
+          message: "Validation Failed",
+          errors: [
+            {
+              resource: "Search",
+              field: "q",
+              code: "invalid",
+            },
+          ],
+          documentation_url:
+            "https://docs.github.com/rest/search/search#search-repositories",
+        },
+        { status: 422 },
+      );
+    }
+
+    // Primary rate limit → 403 (forbidden). no retry.
+    if (q === "trigger:403") {
+      return HttpResponse.json(
+        {
+          message: "API rate limit exceeded",
+          documentation_url:
+            "https://docs.github.com/rest/overview/rate-limits-for-the-rest-api",
+        },
+        { status: 403 },
+      );
+    }
+
+    // Secondary rate limit → 429 (too many request). no retry
+    if (q === "trigger:429") {
+      return HttpResponse.json(
+        {
+          message: "You have exceeded a secondary rate limit",
+          documentation_url:
+            "https://docs.github.com/rest/overview/rate-limits-for-the-rest-api",
+        },
+        { status: 429 },
+      );
+    }
+
     const sorted = sortItems(allItems, sort);
     const start = (page - 1) * perPage;
     const end = page * perPage;

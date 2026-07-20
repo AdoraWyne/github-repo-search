@@ -7,6 +7,7 @@ import Pagination from "./Pagination";
 import { SkeletonCard } from "./SkeletonCard";
 import { RepoCard } from "./RepoCard";
 import { EmptyState } from "./EmptyState";
+import { ErrorBanner } from "./ErrorBanner";
 
 const GITHUB_RESULT_CAP = 1_000;
 const SKELETON_COUNT = 6;
@@ -14,7 +15,7 @@ const SKELETON_COUNT = 6;
 const ResultList: React.FC = () => {
   const [dateNow] = useState(() => Date.now());
   const { q, page, per_page, sort, setPage } = useUrlSearchState();
-  const { data, isLoading, refetch } = useRepoSearch({
+  const { data, isLoading, error, refetch } = useRepoSearch({
     q,
     page,
     per_page,
@@ -40,23 +41,15 @@ const ResultList: React.FC = () => {
     );
   }
 
-  // No data while not loading = the fetch errored.
-  // See docs/react-query-loading-states.md for why this is the error catch-all.
-  // role="alert" announces it to screen readers; Retry re-runs the query via refetch().
+  // No data & not loading → the query is pending-but-not-fetching: failed (error set)
+  // or paused/offline (error null). We branch on `!data` not `isError` because
+  // keepPreviousData keeps earlier results, so this only fires with nothing to show.
+  // Full state breakdown: docs/react-query-loading-states.md
   if (!data) {
-    return (
-      <div role="alert" className="mt-4 text-left text-gray-700">
-        <p>
-          Something went wrong.{" "}
-          <button
-            type="button"
-            onClick={() => refetch()}
-            className="mt-2 text-pink-500 underline"
-          >
-            Retry
-          </button>
-        </p>
-      </div>
+    return error ? (
+      <ErrorBanner error={error} onRetry={() => refetch()} />
+    ) : (
+      <p role="status">Waiting for a connection…</p>
     );
   }
 
