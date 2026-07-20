@@ -83,16 +83,12 @@ describe("SearchPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("failed: shows an error state and recovers when Retry is clicked", async () => {
-    // A counter-backed handler: the first fetch fails, the retry succeeds. One flow
-    // exercises both the `!data` error branch (fetchRepoSearch throws on !res.ok, so
-    // data stays undefined) and the refetch() the Retry button triggers.
-    // The harness sets `retry: false`, so the error surfaces immediately — no backoff.
-    let calls = 0;
+  it("shows an error state and recovers when Retry is clicked", async () => {
+    // This test is about the MANUAL Retry button, not the auto-retry policy.
+    let shouldFail = true;
     server.use(
       http.get("https://api.github.com/search/repositories", () => {
-        calls += 1;
-        if (calls === 1) {
+        if (shouldFail) {
           return new HttpResponse(null, { status: 500 });
         }
         return HttpResponse.json({
@@ -115,12 +111,13 @@ describe("SearchPage", () => {
     await user.type(screen.getByRole("textbox"), "react");
     await user.click(screen.getByRole("button", { name: /submit/i }));
 
-    // First fetch failed → the error region (role="alert") with the message + Retry.
+    // Phase 1: all attempts failed → the error region (role="alert") with Retry.
     expect(await screen.findByRole("alert")).toHaveTextContent(
       /something went wrong/i,
     );
 
-    // Clicking Retry re-runs the query; the second response succeeds.
+    // Phase 2: the server recovers, THEN the user clicks Retry → refetch succeeds.
+    shouldFail = false;
     await user.click(screen.getByRole("button", { name: /retry/i }));
 
     expect(await screen.findByText("facebook/react")).toBeInTheDocument();
@@ -140,10 +137,6 @@ describe("SearchPage", () => {
   });
 
   it("shows the invalid-query message (and no Retry) when the API returns 422", async () => {
-    // Uses the default `trigger:422` handler baked into handlers.ts. A 422 maps to
-    // error.type === "invalid_query". Unlike service_down, this arm renders NO Retry
-    // button: retrying the same rejected query would just 422 again — the user has to
-    // change the query. retry: false (from renderPage) makes the banner synchronous.
     const user = userEvent.setup();
     renderPage();
 
