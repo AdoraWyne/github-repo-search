@@ -162,5 +162,9 @@ stacked up.
 | Duplicate request | React Query serves from cache                         | n/a                           |
 | History churn     | avoided by the guard                                  | n/a                           |
 
-Related: [`url-state-reset-behaviour.md`](./url-state-reset-behaviour.md) for how
+Related:
+[`11_aria-disabled-vs-aria-current.md`](./11_aria-disabled-vs-aria-current.md) for
+why Prev/Next use `aria-disabled` but the current page uses `aria-current` (not
+disabled at all), and
+[`02_url-state-reset-behaviour.md`](./02_url-state-reset-behaviour.md) for how
 `setPage` / `setSort` / `setPerPage` write to the URL.

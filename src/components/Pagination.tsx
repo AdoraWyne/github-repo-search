@@ -24,8 +24,10 @@ const Pagination = ({
   return (
     <nav aria-label="Pagination">
       <button
-        onClick={() => onPageChange(currentPage - 1)}
-        disabled={currentPage === 1}
+        onClick={() => {
+          if (currentPage > 1) onPageChange(currentPage - 1);
+        }}
+        aria-disabled={currentPage === 1}
         className={navBtn(currentPage === 1)}
       >
         Previous
@@ -44,8 +46,9 @@ const Pagination = ({
         return (
           <button
             key={page}
-            onClick={() => onPageChange(page)}
-            disabled={page === currentPage}
+            onClick={() => {
+              if (currentPage !== page) onPageChange(page);
+            }}
             aria-label={`Page ${page}`}
             aria-current={page === currentPage ? "page" : undefined}
             className={`${baseBtn} hover:cursor-pointer ${page === currentPage ? "bg-pink-200" : "hover:bg-gray-100"}`}
@@ -55,8 +58,10 @@ const Pagination = ({
         );
       })}
       <button
-        onClick={() => onPageChange(currentPage + 1)}
-        disabled={currentPage === maxPage}
+        onClick={() => {
+          if (currentPage < maxPage) onPageChange(currentPage + 1);
+        }}
+        aria-disabled={currentPage === maxPage}
         className={navBtn(currentPage === maxPage)}
       >
         Next
