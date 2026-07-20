@@ -39,6 +39,7 @@ export const RepoCard = ({
           <a
             href={html_url}
             target="_blank"
+            rel="noopener noreferrer"
             className="text-pink-500 text-lg font-semibold"
           >
             {full_name}
