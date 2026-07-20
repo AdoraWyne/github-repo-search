@@ -26,7 +26,10 @@ export const RepoCard = ({
     <article className="border border-solid border-pink-300 rounded-md p-4">
       {/* Header */}
       <div className="flex items-center">
-        <img src={owner?.avatar_url} className="w-7 h-7 inline mr-2" />
+        {/* Decorative: the repo-name link beside it already conveys identity.
+            alt="" tells screen readers to skip it (vs. omitting alt, which makes
+            some readers announce the filename/URL). */}
+        <img src={owner?.avatar_url} alt="" className="w-7 h-7 inline mr-2" />
         <span>
           <a
             href={html_url}
