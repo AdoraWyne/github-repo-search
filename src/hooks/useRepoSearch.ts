@@ -21,5 +21,7 @@ export const useRepoSearch = ({
     enabled: q.trim().length > 0,
     staleTime: 60_000,
     placeholderData: keepPreviousData,
+    retry: (failureCount, error) =>
+      error.status >= 400 && error.status < 500 ? false : failureCount < 3,
   });
 };
