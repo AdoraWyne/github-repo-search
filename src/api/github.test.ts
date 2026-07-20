@@ -6,7 +6,6 @@ import {
   toErrorType,
   type FetchRepoSearchParams,
 } from "./github";
-import { ApiError } from "../types/github";
 
 // Spin up a one-off handler that captures the outgoing request URL, call
 // fetchRepoSearch, and hand back the parsed URL so tests can assert on params.
