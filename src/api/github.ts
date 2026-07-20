@@ -23,9 +23,6 @@ const SORTABLE_VALUES: readonly FetchRepoSearchParams["sort"][] = [
   "updated",
 ];
 
-// Boundary logic: translate an HTTP status into our own error vocabulary so
-// nothing downstream has to know about status codes. Skeleton for now — real
-// mappings land test-first, one error code at a time (503 is first).
 export const toErrorType = (status: number): ApiErrorType => {
   switch (status) {
     case 503:
