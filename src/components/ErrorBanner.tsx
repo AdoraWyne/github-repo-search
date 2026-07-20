@@ -1,64 +1,57 @@
-import type { ApiError } from "../types/github";
+import type { ApiError, ApiErrorType } from "../types/github";
 
 export interface ErrorBannerProps {
   error: ApiError;
   onRetry: () => void;
 }
 
-export const ErrorBanner = ({ error, onRetry }: ErrorBannerProps) => {
-  switch (error.type) {
+interface ErrorPresentation {
+  message: string;
+  retryLabel: string | null;
+}
+
+const presentationFor = (type: ApiErrorType): ErrorPresentation => {
+  switch (type) {
     case "service_down":
-      return (
-        <div role="alert" className="mt-4 text-left text-gray-700">
-          <p>
-            GitHub is temporarily unavailable.{" "}
-            <button
-              type="button"
-              onClick={onRetry}
-              className="mt-2 text-pink-500 underline"
-            >
-              Retry
-            </button>
-          </p>
-        </div>
-      );
-    // No Retry button here: a 422 means the query itself is the problem, so
-    // re-running the identical request would just fail again.
+      return {
+        message: "GitHub is temporarily unavailable.",
+        retryLabel: "Retry",
+      };
     case "invalid_query":
-      return (
-        <div role="alert" className="mt-4 text-left text-gray-700">
-          <p>That search couldn&apos;t be processed. Try a shorter query.</p>
-        </div>
-      );
+      return {
+        message: "That search couldn't be processed. Try a shorter query.",
+        retryLabel: null,
+      };
     case "rate_limited":
-      return (
-        <div role="alert" className="mt-4 text-left text-gray-700">
-          <p>
-            Rate limit hit. Try again in a few moments.{" "}
-            <button
-              type="button"
-              onClick={onRetry}
-              className="mt-2 text-pink-500 underline"
-            >
-              Try again
-            </button>
-          </p>
-        </div>
-      );
+      return {
+        message: "Rate limit hit. Try again in a few moments.",
+        retryLabel: "Try again",
+      };
     default:
-      return (
-        <div role="alert" className="mt-4 text-left text-gray-700">
-          <p>
-            Something went wrong.
+      return { message: "Something went wrong.", retryLabel: "Retry" };
+  }
+};
+
+export const ErrorBanner = ({ error, onRetry }: ErrorBannerProps) => {
+  const { message, retryLabel } = presentationFor(error.type);
+
+  return (
+    <div role="alert" className="mt-4 text-left text-gray-700">
+      <p>
+        {message}
+        {retryLabel && (
+          <>
+            {" "}
             <button
               type="button"
               onClick={onRetry}
               className="mt-2 text-pink-500 underline"
             >
-              Retry
+              {retryLabel}
             </button>
-          </p>
-        </div>
-      );
-  }
+          </>
+        )}
+      </p>
+    </div>
+  );
 };
