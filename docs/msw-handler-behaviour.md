@@ -11,8 +11,9 @@ they're documented here as an intentional contract, not a bug.
 **Magic `trigger:*` queries.** Certain exact `q` strings short-circuit the normal path to
 produce a specific response (an empty result set, an HTTP error, etc.). They exist so you can
 reproduce a state **anywhere the handler runs** — the browser dev server *and* tests — without
-a `server.use(...)` override. The error triggers (`trigger:503`, and more to come under Issue
-#8) are how we exercise the error-handling UI end-to-end.
+a `server.use(...)` override. The error triggers (`trigger:503`, `trigger:422`, `trigger:403`,
+`trigger:429`) are how we exercise the error-handling UI end-to-end. Every error trigger is
+named `trigger:<status>` — the string carries the exact HTTP status it forces.
 
 ## 1. The `trigger:empty` magic query → zero results
 
@@ -37,7 +38,10 @@ with `server.use(...)`, but that only works *inside a test*. The magic trigger w
 reproduce the empty state by hand without touching code. It's special-cased **before** the
 sort/slice logic so it short-circuits the normal path.
 
-## 2. The `trigger:503` magic query → a 503 error response
+## 2. The error `trigger:*` queries → HTTP error responses
+
+Each error trigger forces the HTTP status named in the string. `trigger:503` is the worked
+example below; the full set is in the table at the end of this section.
 
 Searching for the exact string **`trigger:503`** returns an HTTP 503 (service unavailable):
 
@@ -61,8 +65,21 @@ realism; you could return `null` as the body and the UI would behave identically
 assertions that depend on this body — nothing in the app consumes it.
 
 **Why an error trigger at all?** Same reasoning as `trigger:empty`: it lets you reproduce a
-failure state without editing code or forcing it per-test. This is the first of the Issue #8
-error triggers; `invalid_query` (422) and `rate_limited` (403/429) will follow the same shape.
+failure state without editing code or forcing it per-test.
+
+**The full error-trigger family.** All of them follow the exact shape above — a GitHub-shaped
+body (cosmetic) plus the status that actually drives the UI via `toErrorType`:
+
+| `q` string        | HTTP status | `error.type`     | Banner shown                       |
+| ----------------- | ----------- | ---------------- | ---------------------------------- |
+| `trigger:503`     | 503         | `service_down`   | "GitHub is temporarily unavailable" |
+| `trigger:422`     | 422         | `invalid_query`  | "That search couldn't be processed" |
+| `trigger:403`     | 403         | `rate_limited`   | "Rate limit hit…"                  |
+| `trigger:429`     | 429         | `rate_limited`   | "Rate limit hit…" (same arm as 403) |
+
+Note **403 and 429 both map to `rate_limited`** — two statuses, one banner. And since nothing
+in the app reads the response body, none of these bodies need to be accurate; only the status
+matters. (A rate limit no longer parses `x-ratelimit-reset`, so these handlers send no headers.)
 
 ## 3. The mock ignores `q` for everything else — you always get the "react" fixtures
 

@@ -910,9 +910,7 @@ export const handlers = [
       });
     }
 
-    // Transient server error. Only the `status: 503` matters — `fetchRepoSearch`
-    // maps status → error.type and never reads this body; the GitHub-shaped body
-    // is here for realism (and to mirror what the real API returns).
+    // Service Down (Service Unavailable). Transient server error.
     if (q === "trigger:503") {
       return HttpResponse.json(
         {
@@ -924,10 +922,7 @@ export const handlers = [
       );
     }
 
-    // Validation error. Like the 503 case, only `status: 422` drives the UI —
-    // `fetchRepoSearch` maps status → error.type and never reads this body. The
-    // GitHub-shaped "Validation Failed" body (with the `errors` array) mirrors
-    // what the real search API returns for a malformed/too-long query.
+    // Validation error (Unprocessable Content). no retry.
     if (q === "trigger:422") {
       return HttpResponse.json(
         {
@@ -943,6 +938,30 @@ export const handlers = [
             "https://docs.github.com/rest/search/search#search-repositories",
         },
         { status: 422 },
+      );
+    }
+
+    // Primary rate limit → 403 (forbidden). no retry.
+    if (q === "trigger:403") {
+      return HttpResponse.json(
+        {
+          message: "API rate limit exceeded",
+          documentation_url:
+            "https://docs.github.com/rest/overview/rate-limits-for-the-rest-api",
+        },
+        { status: 403 },
+      );
+    }
+
+    // Secondary rate limit → 429 (too many request). no retry
+    if (q === "trigger:429") {
+      return HttpResponse.json(
+        {
+          message: "You have exceeded a secondary rate limit",
+          documentation_url:
+            "https://docs.github.com/rest/overview/rate-limits-for-the-rest-api",
+        },
+        { status: 429 },
       );
     }
 
