@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { MemoryRouter, useLocation } from "react-router";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import {
   onlineManager,
   QueryClient,
@@ -149,6 +149,49 @@ describe("SearchPage", () => {
     );
     // The defining difference from the other error arms: no Retry offered.
     expect(screen.queryByRole("button", { name: /retry/i })).toBeNull();
+  });
+
+  it("shows the rate-limit banner, does NOT auto-retry a 403, and re-fires on Try again", async () => {
+    let calls = 0;
+    server.use(
+      http.get("https://api.github.com/search/repositories", () => {
+        calls += 1;
+        return HttpResponse.json(
+          { message: "API rate limit exceeded" },
+          { status: 403 },
+        );
+      }),
+    );
+
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.type(screen.getByRole("textbox"), "react");
+    await user.click(screen.getByRole("button", { name: /submit/i }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      /rate limit hit/i,
+    );
+    // No auto-retry: the status-range rule (4xx → no retry) stops React Query, so the
+    // request fired exactly once — not 1 + retries.
+    expect(calls).toBe(1);
+
+    // Manual retry is a separate path from the auto-retry policy: the Try again button
+    // still fires a fresh request even though auto-retry is disabled for this error.
+    await user.click(screen.getByRole("button", { name: /try again/i }));
+    await waitFor(() => expect(calls).toBe(2));
+  });
+
+  it("shows the same rate-limit banner when the API returns 429", async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.type(screen.getByRole("textbox"), "trigger:429");
+    await user.click(screen.getByRole("button", { name: /submit/i }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      /rate limit hit/i,
+    );
   });
 
   it("shows the waiting-for-connection message on a first load while offline", async () => {
