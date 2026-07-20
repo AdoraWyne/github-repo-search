@@ -47,8 +47,13 @@ replaced by the banner. The banner picks its message from the semantic
 | --- | --- | --- | --- |
 | `service_down` | 503 | temporarily unavailable | yes |
 | `invalid_query` | 422 | change your query | no |
-| `rate_limited` | 403 / 429 | wait / countdown (🚧 Slice C) | when reset |
+| `rate_limited` | 403 / 429 | rate limited, try again shortly | yes ("Try again") |
 | `unknown` | anything else | generic "something went wrong" | yes |
+
+> Note: `rate_limited` originally planned a live countdown from `x-ratelimit-reset`.
+> We dropped it for now (showing seconds felt like too much) — the banner is a static
+> "Try again in a few moments" and the reset parsing was removed. Re-add when the
+> countdown returns.
 
 ## 4. `!data && !error` → "Waiting for a connection…"
 
